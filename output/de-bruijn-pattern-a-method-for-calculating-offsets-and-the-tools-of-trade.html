@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Person">
+<head>
+            <meta charset="utf-8">
+        <!-- Site Meta Data -->
+        <title>De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="gbaru">
+
+        <link rel="shortcut icon" href="">
+
+        <!-- schema.org -->
+        <meta itemprop="name" content="gbaru's blog">
+        <meta itemprop="image" content="/theme/images/icons/avatar.png">
+        <meta itemprop="description" content="">
+
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+        <!-- Style Meta Data -->
+        <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link rel="stylesheet" href="/theme/css/pygments.css" type="text/css"/>
+
+        <!-- Feed Meta Data -->
+
+        <!-- Twitter Feed -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="">
+        <meta name="twitter:image" content="">
+
+    <meta name="twitter:creator" content="">
+    <meta name="twitter:url" content="/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html">
+    <meta name="twitter:title" content="gbaru's blog ~ De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade">
+    <meta name="twitter:description" content="Intro In the field of binary exploitation, it is a common occurrence to have to determine the offset of our input to a program. In early buffer overflow exploits, a large buffer of repeating characters such as &#34;A&#34; * 400 was often used. However, when overwriting the instruction pointer, the exact …">
+
+    <!-- Facebook Meta Data -->
+    <meta property="og:title" content="gbaru's blog ~ De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade"/>
+    <meta property="og:description" content="Intro In the field of binary exploitation, it is a common occurrence to have to determine the offset of our input to a program. In early buffer overflow exploits, a large buffer of repeating characters such as &#34;A&#34; * 400 was often used. However, when overwriting the instruction pointer, the exact …"/>
+    <meta property="og:image" content=""/>
+</head>
+
+<body>
+<!-- Sidebar -->
+<aside>
+    <center><a href="/theme/images/icons/avatar.png"><img id="avatar" src="/theme/images/icons/avatar.png"></a></center>
+    <h1>gbaru's blog</h1>
+        <p>Binary Exploitation Lessons</p>
+    <br>
+
+
+    <nav class="nav">
+        <ul class="list-bare">
+
+                <li><a class="nav__link" href="/">Articles</a></li>
+                <li><a class="nav__link" href="/tags/">Tags</a></li>
+
+
+        </ul>
+    </nav>
+
+    <p class="social">
+                <a href="mailto:blog.gbarut@riskreduction.net" target="_blank"><img
+                        src="/theme/images/icons/mail-128.png"></a>
+                <a href="http://twitter.com/GanbaruTobi" target="_blank"><img
+                        src="/theme/images/icons/twitter.png"></a>
+                <a href="http://github.com/GanbaruTobi" target="_blank"><img
+                        src="/theme/images/icons/github.png"></a>
+    </p>
+
+        <h2>Categories</h2>
+        <ul class="navbar">
+                <li class="active"><a
+                        href="/category/general.html">General</a></li>
+                <li><a
+                        href="/category/misc.html">Misc</a></li>
+                <li><a
+                        href="/category/windows.html">Windows</a></li>
+        </ul>
+
+
+</aside>
+
+<!-- Content -->
+<article>
+    <section id="content">
+        <article>
+            <h2 class="post_title post_detail"><a href="/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html" rel="bookmark"
+                                                  title="Permalink to De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade">De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade</a></h2>
+            <div class="entry-content blog-post">
+                <h2>Intro</h2>
+<p>In the field of binary exploitation, it is a common occurrence to have to determine the offset of our input to a program. In early buffer overflow exploits, a large buffer of repeating characters such as "A" * 400 was often used. However, when overwriting the instruction pointer, the exact location of the overwrite was unknown.</p>
+<p>To address this issue, the technique of using ever-changing patterns was introduced. For example, a pattern like "...AAACAAADAAAE..." could be used.
+By finding the location of the instruction pointer in the pattern (imagine it pointing to "AAAD"), the offset of the input could be determined. 
+But the de bruijn pattern is even better as you might think by just this example. Because it can also give you the offset of pointing to "AADA" or "ADAA" or "DAAA", since each of this sub-parts are also unique. So any offset into the input pattern can be precisely determined.
+This technique remains an important tool in modern binary exploitation.</p>
+<h2>Tools</h2>
+<p>There are many tools available to create such patterns and calculate offsets in binary exploitation. However, I have some opinions and tips I'd like to share.</p>
+<p>One commonly used tool is the Metasploit Framework, which includes the msf-pattern-create and msf-pattern-offset commands:</p>
+<div class="highlight"><pre><span></span><code>msf-pattern-create<span class="w"> </span>-l<span class="w"> </span>&lt;length&gt;
+
+msf-pattern-offset<span class="w"> </span>-q<span class="w"> </span>&lt;pattern&gt;
+</code></pre></div>
+
+<p>Although this tool is well-known and recommended by many, I personally do not prefer it due to its clunkiness and difficulty of use on Windows. Additionally, it can be flagged by antivirus software, causing additional problems.</p>
+<p>For these reasons, I prefer to use radare2 and its ragg2 tool, which works well on Windows, Linux, and Mac:</p>
+<div class="highlight"><pre><span></span><code>ragg2<span class="w"> </span>-P<span class="w"> </span>&lt;length&gt;<span class="w"> </span>-r
+
+ragg2<span class="w"> </span>-P<span class="w"> </span>&lt;length&gt;<span class="w"> </span>-q<span class="w"> </span>&lt;offset&gt;<span class="w"> </span><span class="c1"># offset as 0x....</span>
+</code></pre></div>
+
+<p>One limitation of ragg2 is that it can only create one pattern with a predefined alphabet. This limitation can be problematic when working with input buffers that contain so-called "bad characters" that the target program does not handle correctly.</p>
+<p>An alternative tool to overcome this limitation is pwntools pwnlib. Although its usage requires coding, it is very simple and can easily be accomplished with a few lines of code:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1"># Define your custom alphabet</span>
+<span class="n">alphabet</span> <span class="o">=</span> <span class="s1">&#39;abcdefghijklmnopqrstuvwxyz&#39;</span>
+
+<span class="c1"># Generate a cyclic pattern with a length of 200 using the custom alphabet</span>
+<span class="n">pattern</span> <span class="o">=</span> <span class="n">cyclic</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+
+<span class="c1"># Find the offset of a later specified value in the pattern</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="n">cyclic_find</span><span class="p">(</span><span class="s1">&#39;mnaa&#39;</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">)</span>
+
+<span class="c1"># Print the offset</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Offset: </span><span class="si">{</span><span class="n">offset</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>It's worth noting that Metasploit's pattern-create command does have an option (-s) for specifying a custom alphabet.</p>
+<p>Other tools such as mona.py (Python2) or PEDA (only for GDB) are also available. However, they each have limitations that make me hesitant to include them in my general toolset.</p>
+<h2>Alphabets in patterns</h2>
+<p>Lets think about the alphabets for a second. In case we have a limitation and we want to switch to other characters, just how many would we need for creating a fitting buffer?</p>
+<p>The chars in these patterns are normaly a byte wide, which means on a 32-bit system 4 chars will be filling 1 register.
+So we have alphabet size ^ 4.</p>
+<p>This comes down to</p>
+<div class="highlight"><pre><span></span><code><span class="mf">2</span><span class="w">  </span><span class="n">chars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">16</span><span class="w">    </span><span class="n">maximal</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="nb">len</span><span class="n">gth</span>
+<span class="mf">5</span><span class="w">  </span><span class="n">chars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">625</span><span class="w">   </span><span class="n">maximal</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="nb">len</span><span class="n">gth</span>
+<span class="mf">10</span><span class="w"> </span><span class="n">chars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10000</span><span class="w"> </span><span class="n">maximal</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="nb">len</span><span class="n">gth</span>
+</code></pre></div>
+
+<p>On 64-bit systems its even easier, since it will be alphabet size ^ 8</p>
+            </div>
+            <div class="post_list">
+                <span>By </span>
+                <a href="/author/gbaru.html">@gbaru</a>
+                <span> in </span>
+                <span class="post_category"><a href="/category/general.html" rel="bookmark"
+                                               title="Permalink to General">[ General ]</a></span>
+                <span class="post_date">So 07 Mai 2023</span>
+                <div><span>Tags : </span>
+                            <span><a href="/tag/offset.html">#offset, </a></span>
+                            <span><a href="/tag/brujin.html">#brujin, </a></span>
+                            <span><a href="/tag/debrujin.html">#debrujin, </a></span>
+                </div>
+
+            </div>
+        </article>
+    </section>
+</article>
+
+<!-- Footer -->
+    <footer>
+        <p>
+        </p>
+    </footer>
+
+
+</body>
+</html>
