@@ -15,7 +15,7 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
-SIDEBAR_DIGEST = 'Binary Exploitation Lessons'
+SIDEBAR_DIGEST = 'Binary Exploitation and Red Teaming'
 
 MENUITEMS = (('Articles', '/'),
              ('Tags', SITEURL+'/tags/'))
