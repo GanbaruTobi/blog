@@ -1,120 +1,114 @@
-<!doctype html>
-<html lang="en" itemscope itemtype="http://schema.org/Person">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-                <meta charset="utf-8">
-        <!-- Site Meta Data -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
         <title>gbaru's blog - Windows Internals</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <meta name="author" content="gbaru">
-
-        <link rel="shortcut icon" href="">
-
-        <!-- schema.org -->
-        <meta itemprop="name" content="gbaru's blog">
-        <meta itemprop="image" content="/theme/images/icons/avatar.png">
-        <meta itemprop="description" content="">
-
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
-        <!-- Style Meta Data -->
-        <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
-        <link rel="stylesheet" href="/theme/css/pygments.css" type="text/css"/>
-
-        <!-- Feed Meta Data -->
-
-        <!-- Twitter Feed -->
-        <meta name="twitter:card" content="summary">
-        <meta name="twitter:site" content="">
-        <meta name="twitter:image" content="">
-
-    <meta name="twitter:creator" content="">
-    <meta name="twitter:url" content="">
-    <meta name="twitter:title" content="gbaru's blog">
-    <meta name="twitter:description" content="Binary Exploitation Lessons">
-
-    <!-- Facebook Meta Data -->
-    <meta property="og:title" content="gbaru's blog"/>
-    <meta property="og:description" content="Binary Exploitation Lessons"/>
-    <meta property="og:image" content=""/>
-
-    <meta name="twitter:creator" content="">
-    <meta name="twitter:url" content="/tag/windows-internals.html">
-    <meta name="twitter:title" content="gbaru's blog ~ Windows Internals">
-    <meta name="twitter:description" content="Articles de Windows Internals">
-
-    <!-- Facebook Meta Data -->
-    <meta property="og:title" content="gbaru's blog ~ Windows Internals"/>
-    <meta property="og:description" content="Articles de Windows Internals"/>
-    <meta property="og:image" content="/theme/images/icons/avatar.png"/>
+        <link rel="stylesheet" href="/theme/css/main.css" />
 </head>
 
-<body>
-<!-- Sidebar -->
-<aside>
-    <center><a href="/theme/images/icons/avatar.png"><img id="avatar" src="/theme/images/icons/avatar.png"></a></center>
-    <h1>gbaru's blog</h1>
-        <p>Binary Exploitation Lessons</p>
-    <br>
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">gbaru's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/">Articles</a></li>
+                    <li><a href="/tags/">Tags</a></li>
+                    <li><a href="/category/general.html">General</a></li>
+                    <li><a href="/category/misc.html">Misc</a></li>
+                    <li><a href="/category/red.html">Red</a></li>
+                    <li><a href="/category/windows.html">Windows</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
 
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/preparing-for-windows-internals-for-security-engineers.html">Preparing for Windows Internals for Security Engineers</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-05-08T13:00:00+02:00">
+                Published: Mon 08 May 2023
+        </abbr>
 
-    <nav class="nav">
-        <ul class="list-bare">
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/gbaru.html">gbaru</a>
+        </address>
+<p>In <a href="/category/windows.html">Windows</a>.</p>
+<p>tags: <a href="/tag/offensivecon.html">OffensiveCon</a> <a href="/tag/windows-internals.html">Windows Internals</a> <a href="/tag/yarden-shafir.html">Yarden Shafir</a> </p>
+</footer><!-- /.post-info --><p>In mid of May I have the honor to participate in the Windows Internals 4-day training at OffensiveCon. Since I want to come prepared there are some things I will do beforehand. For anyone else going for the training or wanting to check out its topics this might come in handy.</p>
+<h2>General Preperation</h2>
+<p>I will go with a split process of reading the new Windows Internals Books and watching the videos on Plural Sight to Windows 11 from Pavel Yosifovich (payed content). They both have the same topic, the books have more depth, but are somewhat harder and more time consuming to go through.</p>
+<p>The videos are very good, but sometimes lack on a certain topic. Everytime one option gets boring or I find myself not progressing I switch to the other method.</p>
+<h2>Specific Preperation</h2>
+<p>After that I go trough the description of the training and on every buzzword I don't know of, I will research about the contents.</p>
+<p>The buzzwords per OS version are:</p>
+<p>Windows 11:</p>
+<ol>
+<li>GRU bootkits </li>
+<li>PLA software supply chain implants</li>
+<li>NSA Backdoors</li>
+<li>Kernel Data Protection (KDP)</li>
+<li>eXtended Control Flow Guard (XFG)</li>
+<li>Kernel Control-flow Enforcement Technology (KCET)</li>
+<li>System Guard Runtime Assertions</li>
+<li>Secure Launch framework (Intel TXT and AMD SKINIT for new DRTM-based attestation)</li>
+</ol>
+<p>Windows 10:</p>
+<ol>
+<li>Virtual Trust Levels (VTL)</li>
+<li>Virtualization Based Security (VBS)</li>
+<li>Hyper Visor Code Integrity (HVCI)</li>
+<li>Kernel Control Flow Guard (KCFG)</li>
+<li>Software Guard Extensions (SGX)</li>
+</ol>
+<p>Windows 8.1:</p>
+<ol>
+<li>Protected Process Light</li>
+<li>Custome Code Signing Policies</li>
+</ol>
+<p>Windows 8:</p>
+<ol>
+<li>AppContainer</li>
+<li>Secure Boot</li>
+</ol>
+<p>Windows 7:</p>
+<ol>
+<li>Object Manager data structures</li>
+</ol>
+<h3>Resources to the Topics</h3>
+<p><span style="color:blue">GRU Rootkits</span> seems to be made up or at least I can't find anything about it. I guess GRU is something russian... or the (good) villain from minions. Anyway, its a rootkit and therefore just a kernel malware.</p>
+<p>Sadly again, no idea what <span style="color:blue">PLA</span> stands for. But its about supply chain attacks. I don't see how preparation for that would help me for the course.</p>
+<p><span style="color:blue">NSA Backdoors</span> is at least something known. So the text goes on to describe the above three as kernel and firmware malware.</p>
+<p>My understanding is its about modified kernels or drivers.
+Therefore preparing would be to learn about offensive driver development (they run in the kernel). I took the course from <a href="https://training.zeropointsecurity.co.uk/courses/offensive-driver-development">here</a>.</p>
+<p>Also there is a book from Pavel about Windows Kernel Programming, which I will go through.</p>
+<p>Next we have <span style="color:blue">Kernel Data Protection (KDP)</span>. It is explained <a href="https://www.microsoft.com/en-us/security/blog/2020/07/08/introducing-kernel-data-protection-a-new-platform-security-technology-for-preventing-data-corruption/">here</a>. It is a mechanism to mark parts of kernel and driver as read only data. A copy or other way of attestation of the data is hold in the hypervisor through VBS (read on for VBS).</p>
+<p>For <span style="color:blue">eXtended Control Flow Guard (XFG)</span> a good start is <a href="https://connormcgarr.github.io/examining-xfg/">here</a>, followed with <a href="https://www.offsec.com/offsec/extended-flow-guard/">that</a>.</p>
+<p>The <span style="color:blue">Kernel Control-flow Enforcement Technology (KCET)</span> seems to be very new. I just read about normal CET <a href="https://windows-internals.com/cet-on-windows/">here</a> to get a basic understanding.
+It uses a "Shadow Stack" which holds a copy of all return addresses used by the program. That way its not possible to overwrite the return address of a function without being noticed. I would assume that a shadow stack in a hypervisor will do the same for the kernel.</p>
+<p><span style="color:blue">System Guard Runtime Attestation</span> is written about <a href="https://www.microsoft.com/en-us/security/blog/2018/04/19/introducing-windows-defender-system-guard-runtime-attestation/">here</a>  </p>
+<p><span style="color:blue">Secure Launch framework</span> seems to be for secure boot.
+I am not interested so much, but <a href="https://community.amd.com/t5/business/amd-and-microsoft-secured-core-pc/ba-p/418204">here</a> is good information.</p>
+<p>From here on everything is in the Windows Internals Books, which should be a very good reference.</p>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
 
-                <li><a class="nav__link" href="/">Articles</a></li>
-                <li><a class="nav__link" href="/tags/">Tags</a></li>
+                            <li><a href="mailto:blog.gbarut@riskreduction.net">mail-128</a></li>
+                            <li><a href="http://twitter.com/GanbaruTobi">twitter</a></li>
+                            <li><a href="http://github.com/GanbaruTobi">github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
 
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
 
-        </ul>
-    </nav>
-
-    <p class="social">
-                <a href="mailto:blog.gbarut@riskreduction.net" target="_blank"><img
-                        src="/theme/images/icons/mail-128.png"></a>
-                <a href="http://twitter.com/GanbaruTobi" target="_blank"><img
-                        src="/theme/images/icons/twitter.png"></a>
-                <a href="http://github.com/GanbaruTobi" target="_blank"><img
-                        src="/theme/images/icons/github.png"></a>
-    </p>
-
-        <h2>Categories</h2>
-        <ul class="navbar">
-                <li><a
-                        href="/category/general.html">General</a></li>
-                <li><a
-                        href="/category/misc.html">Misc</a></li>
-                <li><a
-                        href="/category/windows.html">Windows</a></li>
-        </ul>
-
-
-</aside>
-
-<!-- Content -->
-<article>
-    <h1 class="title"></h1>
-        <ol class="posts">
-    <h2 class="latest">Tag: Windows Internals</h2>
-                <li class="post_list"><p class="post_entry">
-                    <h2 class="post_title"><a href="/preparing-for-windows-internals-for-security-engineers.html" rel="bookmark"
-                                              title="Permalink to Preparing for Windows Internals for Security Engineers">Preparing for Windows Internals for Security Engineers</a>
-                    </h2>
-                    <a href="/author/gbaru.html">@gbaru</a>
-                    <span> in </span>
-                    <span class="post_category"><a href="/category/windows.html" rel="bookmark"
-                                                   title="Permalink to Windows">[ Windows ]</a></span>
-                    <span class="post_date">Mo 08 Mai 2023</span>
-                </li>
-        </ol>
-
-
-</article>
-
-<!-- Footer -->
-    <footer>
-        <p>
-        </p>
-    </footer>
-
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
 
 </body>
 </html>
