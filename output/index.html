@@ -1,206 +1,141 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Person">
 <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="generator" content="Pelican" />
-        <title>gbaru's blog</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
+            <meta charset="utf-8">
+        <!-- Site Meta Data -->
+        <title> gbaru's blog | Binary Exploitation and Red Teaming </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="gbaru">
+
+        <link rel="shortcut icon" href="">
+
+        <!-- schema.org -->
+        <meta itemprop="name" content="gbaru's blog">
+        <meta itemprop="image" content="/theme/images/icons/avatar.png">
+        <meta itemprop="description" content="">
+
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+        <!-- Style Meta Data -->
+        <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link rel="stylesheet" href="/theme/css/pygments.css" type="text/css"/>
+
+        <!-- Feed Meta Data -->
+
+        <!-- Twitter Feed -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="">
+        <meta name="twitter:image" content="">
+
+    <meta name="twitter:creator" content="">
+    <meta name="twitter:url" content="">
+    <meta name="twitter:title" content="gbaru's blog">
+    <meta name="twitter:description" content="Binary Exploitation and Red Teaming">
+
+    <!-- Facebook Meta Data -->
+    <meta property="og:title" content="gbaru's blog"/>
+    <meta property="og:description" content="Binary Exploitation and Red Teaming"/>
+    <meta property="og:image" content=""/>
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="/">gbaru's blog</a></h1>
-                <nav><ul>
-                    <li><a href="/">Articles</a></li>
-                    <li><a href="/tags/">Tags</a></li>
-                    <li><a href="/category/general.html">General</a></li>
-                    <li><a href="/category/misc.html">Misc</a></li>
-                    <li><a href="/category/red.html">Red</a></li>
-                    <li><a href="/category/windows.html">Windows</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
+<body>
+<!-- Sidebar -->
+<aside>
+    <center><a href="/theme/images/icons/avatar.png"><img id="avatar" src="/theme/images/icons/avatar.png"></a></center>
+    <h1>gbaru's blog</h1>
+        <p>Binary Exploitation and Red Teaming</p>
+    <br>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/dll-sideloading-attack-a-fast-how-to.html">DLL-Sideloading Attack: A Fast How-To</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2023-06-09T22:00:00+02:00">
-                Published: Fri 09 June 2023
-        </abbr>
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/gbaru.html">gbaru</a>
-        </address>
-<p>In <a href="/category/red.html">Red</a>.</p>
-<p>tags: <a href="/tag/koppeling.html">Koppeling</a> <a href="/tag/dll.html">DLL</a> <a href="/tag/sideload.html">Sideload</a> <a href="/tag/sideloading.html">Sideloading</a> <a href="/tag/red-team.html">Red-Team</a> <a href="/tag/windows.html">Windows</a> </p>
-</footer><!-- /.post-info --><h2>What is DLL-Sideloading</h2>
-<p>In this guide, we will provide a quick overview of a DLL-sideloading attack and demonstrate how it can be executed.
-Dynamic link libraries (DLLs) are loaded by the operating system (OS) when an application starts. There are two main methods of loading DLLs, and we focus on those that are specified only by name and not by an absolute path.</p>
-<p>DLLs without a specified path are searched by the OS. The OS has a defined search order, which can vary depending on certain settings such as Safe-DLL. To determine the specific search order for your system, you can conduct a search or refer to relevant documentation.</p>
-<h2>The Attack</h2>
-<p>If we can successfully place our own loaded DLL in a directory that is part of the search order and is positioned earlier than the original file, our DLL will be loaded along with the program. It is crucial to note that we must have write access to the directory in order to accomplish this.</p>
-<h2>Tools</h2>
-<h3>siofra</h3>
-<p>There is a tool that is able to search for these kinds of vulnerabilities I like:
-It is <a href="https://github.com/Cybereason/siofra">siofra</a>.</p>
-<p>Consider the following powershell script from <a href="https://twitter.com/ShitSecure/status/1566126264469098497/photo/1">here</a>. For 32-bit exchange the Siofra.exe</p>
-<div class="highlight"><pre><span></span><code><span class="nb">Get-ChildItem</span> <span class="n">-Path</span> <span class="s2">&quot;C:\Program Files\&quot;</span> <span class="n">-Filter</span> <span class="p">*.</span><span class="n">exe</span> <span class="n">-Recurse</span> <span class="o">-File</span> <span class="n">-Name</span> <span class="p">|</span> <span class="k">ForEach</span><span class="n">-Object</span><span class="p">{</span>
-    <span class="n">mkdir</span> <span class="n">C</span><span class="p">:\</span><span class="n">temp</span><span class="p">\</span><span class="n">hijacktest</span>
-    <span class="nv">$binarytoCheck</span> <span class="p">=</span> <span class="s2">&quot;C:\Program Files\&quot;</span> <span class="p">+</span> <span class="nv">$_</span>
-    <span class="n">C</span><span class="p">:\</span><span class="n">Tools</span><span class="p">\</span><span class="n">siofra</span><span class="p">\</span><span class="n">Siofra64</span><span class="p">.</span><span class="n">exe</span> <span class="p">-</span><span class="n">-mode</span> <span class="n">file-scan</span> <span class="p">-</span><span class="n">-enum-dependency</span> <span class="p">-</span><span class="n">-dll-hijack</span> <span class="o">-f</span> <span class="nv">$binarytoCheck</span> <span class="p">&gt;&gt;</span> <span class="n">C</span><span class="p">:\</span><span class="n">temp</span><span class="p">\</span><span class="n">hijacktest</span><span class="p">\</span><span class="n">toCheck</span><span class="p">.</span><span class="n">txt</span>
-<span class="p">}</span>
-</code></pre></div>
+    <nav class="nav">
+        <ul class="list-bare">
 
-<p>Generally the output can be considered in two parts, the binary analysis shows which dlls might be attackable with an exlamation mark:</p>
-<p><img alt="picture 1" src="../images/49369742dbe0ea41b57696a371613a5574117beee51a7cf96318b04763785fb5.png">  </p>
-<p>In the next section it will analyse the probable attackable libraries and gives an exploitabilty suggestion:
-<img alt="picture 2" src="../images/38019f07c834ac302e5f4c84eba042d7d9a2836f8f507832967946b3a8177bda.png">  </p>
-<p>Here you can see, which dll's one would have to place and where.
-A nice next step would be to get which of the vulnerable marked locations are writeable to us.</p>
-<h3>Koppeling</h3>
-<p>When placing a DLL with our attack code, we quickly realize the need to provide all the functions that the main binary wants to import from the library. This challenge is addressed by using <a href="https://github.com/monoxgas/Koppeling">koppeling</a>. </p>
-<p>Koppeling is a tool that allows us to provide the original desired DLL and our attacker code separately. It facilitates the merging of these components, ensuring that all the required functions are available for the application.</p>
-<p>I use <a href="https://github.com/jfmaes/Invoke-DLLClone">Invoke-DLLClone</a>, which uses Koppeling inside, since I had problems with the original code. Then we just need some dll code like this:</p>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;windows.h&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;pch.h&quot;</span>
+                <li><a class="nav__link" href="/">Articles</a></li>
+                <li><a class="nav__link" href="/tags/">Tags</a></li>
 
-<span class="n">DWORD</span><span class="w"> </span><span class="n">WINAPI</span><span class="w"> </span><span class="n">fireLazor</span><span class="p">(</span><span class="n">LPVOID</span><span class="w"> </span><span class="n">lpParameter</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">WinExec</span><span class="p">(</span><span class="s">&quot;calc.exe&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
 
-<span class="n">BOOL</span><span class="w"> </span><span class="n">APIENTRY</span><span class="w"> </span><span class="n">DllMain</span><span class="p">(</span><span class="n">HMODULE</span><span class="w"> </span><span class="n">hModule</span><span class="p">,</span>
-<span class="w">    </span><span class="n">DWORD</span><span class="w"> </span><span class="n">ul_reason_for_call</span><span class="p">,</span>
-<span class="w">    </span><span class="n">LPVOID</span><span class="w"> </span><span class="n">lpReserved</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">HANDLE</span><span class="w"> </span><span class="n">threadHandle</span><span class="p">;</span>
+        </ul>
+    </nav>
 
-<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">ul_reason_for_call</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">DLL_PROCESS_ATTACH</span><span class="p">:</span>
-<span class="w">        </span><span class="n">threadHandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateThread</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">fireLazor</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
-<span class="w">        </span><span class="n">CloseHandle</span><span class="p">(</span><span class="n">threadHandle</span><span class="p">);</span>
+    <p class="social">
+                <a href="mailto:blog.gbarut@riskreduction.net" target="_blank"><img
+                        src="/theme/images/icons/mail-128.png"></a>
+                <a href="http://twitter.com/GanbaruTobi" target="_blank"><img
+                        src="/theme/images/icons/twitter.png"></a>
+                <a href="http://github.com/GanbaruTobi" target="_blank"><img
+                        src="/theme/images/icons/github.png"></a>
+    </p>
 
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">DLL_THREAD_ATTACH</span><span class="p">:</span>
-<span class="w">        </span><span class="k">break</span><span class="p">;</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">DLL_THREAD_DETACH</span><span class="p">:</span>
-<span class="w">        </span><span class="k">break</span><span class="p">;</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">DLL_PROCESS_DETACH</span><span class="p">:</span>
-<span class="w">        </span><span class="k">break</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">TRUE</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
+        <h2>Categories</h2>
+        <ul class="navbar">
+                <li><a
+                        href="/category/general.html">General</a></li>
+                <li><a
+                        href="/category/misc.html">Misc</a></li>
+                <li><a
+                        href="/category/red.html">Red</a></li>
+                <li><a
+                        href="/category/windows.html">Windows</a></li>
+        </ul>
 
-<h3>Example</h3>
-<p>I will attack 010 editor. As we saw before, its version.dll is vulnerable.</p>
-<p>Compile the source code from above with Visual Studio as a DLL library and run</p>
-<div class="highlight"><pre><span></span><code><span class="nb">Invoke-DllClone</span> <span class="n">-Source</span> <span class="n">C</span><span class="p">:\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">version</span><span class="p">.</span><span class="n">dll</span> <span class="n">-target</span> <span class="n">C</span><span class="p">:\</span><span class="n">Users</span><span class="p">\</span><span class="n">you</span><span class="p">\</span><span class="n">source</span><span class="p">\</span><span class="n">repos</span><span class="p">\</span><span class="n">Dll1</span><span class="p">\</span><span class="n">x64</span><span class="p">\</span><span class="n">Release</span><span class="p">\</span><span class="n">urname</span><span class="p">.</span><span class="n">dll</span> <span class="n">-output</span> <span class="n">version</span><span class="p">.</span><span class="n">dll</span> <span class="n">-sign</span>
-</code></pre></div>
 
-<p>Placing it in the same directory as 010 editor and running it will cause this:</p>
-<p><img alt="picture 3" src="../images/aed4d3a15b0f37c3c97b5f5b5ba5a23b950a4742a951ec51dae51ae7a9594800.png">  </p>
-<h2>Downgrading</h2>
-<p>Most of the time, I consider myself to be in a lower privileged position and contemplate injecting my code somewhere. However, there is another attack against DLL sideloading known as downgrading. This attack may be challenging or ineffective in low-privilege situations, but it becomes particularly interesting in higher privilege scenarios.</p>
-<p>With downgrading, we can replace a DLL with a known vulnerable version. If the other imported functions remain intact, the loading process will succeed (although there may be cases where the output of the functions has changed, resulting in runtime issues, but this is not very common).</p>
-<p>A downgraded attack-code-free DLL is extremely difficult for the blue team to track. In fact, it can even be an officially signed DLL. Of course, it's essential to have an appropriate exploit to make use of this technique, so keep that in mind.</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</aside>
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/preparing-for-windows-internals-for-security-engineers.html" rel="bookmark"
-                           title="Permalink to Preparing for Windows Internals for Security Engineers">Preparing for Windows Internals for Security Engineers</a></h1>
-                </header>
+<!-- Content -->
+<article>
+    <h1 class="title"></h1>
+        <ol class="posts">
+<h2 class="latest">Latest Posts</h2>                <li class="post_list"><p class="post_entry">
+                    <h2 class="post_title"><a href="/dll-sideloading-attack-a-fast-how-to.html" rel="bookmark"
+                                              title="Permalink to DLL-Sideloading Attack: A Fast How-To">DLL-Sideloading Attack: A Fast How-To</a>
+                    </h2>
+                    <a href="/author/gbaru.html">@gbaru</a>
+                    <span> in </span>
+                    <span class="post_category"><a href="/category/red.html" rel="bookmark"
+                                                   title="Permalink to Red">[ Red ]</a></span>
+                    <span class="post_date">Fri 09 June 2023</span>
+                </li>
+                <li class="post_list"><p class="post_entry">
+                    <h2 class="post_title"><a href="/preparing-for-windows-internals-for-security-engineers.html" rel="bookmark"
+                                              title="Permalink to Preparing for Windows Internals for Security Engineers">Preparing for Windows Internals for Security Engineers</a>
+                    </h2>
+                    <a href="/author/gbaru.html">@gbaru</a>
+                    <span> in </span>
+                    <span class="post_category"><a href="/category/windows.html" rel="bookmark"
+                                                   title="Permalink to Windows">[ Windows ]</a></span>
+                    <span class="post_date">Mon 08 May 2023</span>
+                </li>
+                <li class="post_list"><p class="post_entry">
+                    <h2 class="post_title"><a href="/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html" rel="bookmark"
+                                              title="Permalink to De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade">De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade</a>
+                    </h2>
+                    <a href="/author/gbaru.html">@gbaru</a>
+                    <span> in </span>
+                    <span class="post_category"><a href="/category/general.html" rel="bookmark"
+                                                   title="Permalink to General">[ General ]</a></span>
+                    <span class="post_date">Sun 07 May 2023</span>
+                </li>
+                <li class="post_list"><p class="post_entry">
+                    <h2 class="post_title"><a href="/hello-to-my-blog.html" rel="bookmark"
+                                              title="Permalink to Hello to my Blog">Hello to my Blog</a>
+                    </h2>
+                    <a href="/author/gbaru.html">@gbaru</a>
+                    <span> in </span>
+                    <span class="post_category"><a href="/category/misc.html" rel="bookmark"
+                                                   title="Permalink to Misc">[ Misc ]</a></span>
+                    <span class="post_date">Sat 06 May 2023</span>
+                </li>
+        </ol>
 
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-05-08T13:00:00+02:00">
-                Published: Mon 08 May 2023
-        </abbr>
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/gbaru.html">gbaru</a>
-        </address>
-<p>In <a href="/category/windows.html">Windows</a>.</p>
-<p>tags: <a href="/tag/offensivecon.html">OffensiveCon</a> <a href="/tag/windows-internals.html">Windows Internals</a> <a href="/tag/yarden-shafir.html">Yarden Shafir</a> </p>
-</footer><!-- /.post-info -->                <p>In mid of May I have the honor to participate in the Windows Internals 4-day training at OffensiveCon. Since I want to come prepared there are some things I will do beforehand. For anyone else going for the training or wanting to check out its topics this might come in …</p>
-                <a class="readmore" href="/preparing-for-windows-internals-for-security-engineers.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
+</article>
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html" rel="bookmark"
-                           title="Permalink to De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade">De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade</a></h1>
-                </header>
+<!-- Footer -->
+    <footer>
+        <p>
+        </p>
+    </footer>
 
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-05-07T22:00:00+02:00">
-                Published: Sun 07 May 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/gbaru.html">gbaru</a>
-        </address>
-<p>In <a href="/category/general.html">General</a>.</p>
-<p>tags: <a href="/tag/offset.html">offset</a> <a href="/tag/brujin.html">brujin</a> <a href="/tag/debrujin.html">debrujin</a> </p>
-</footer><!-- /.post-info -->                <h2>Intro</h2>
-<p>In the field of binary exploitation, it is a common occurrence to have to determine the offset of our input to a program. In early buffer overflow exploits, a large buffer of repeating characters such as "A" * 400 was often used. However, when overwriting the instruction pointer, the exact …</p>
-                <a class="readmore" href="/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/hello-to-my-blog.html" rel="bookmark"
-                           title="Permalink to Hello to my Blog">Hello to my Blog</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-05-06T22:10:00+02:00">
-                Published: Sat 06 May 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/gbaru.html">gbaru</a>
-        </address>
-<p>In <a href="/category/misc.html">Misc</a>.</p>
-<p>tags: <a href="/tag/none.html">None</a> </p>
-</footer><!-- /.post-info -->                <p>Hello ppl,</p>
-<p>this will be my blog, where I write about binary exploitation.
-I will focus on Windows mostly, at least till end of 2025.</p>
-<p>Currently I work on finishing Offensive Security's OSED Course (EXP-301) and
-will have the Windows Internals Training at OffensiveCon in the mid of May.</p>
-<p>I …</p>
-                <a class="readmore" href="/hello-to-my-blog.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
-        <section id="extras" class="body">
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-
-                            <li><a href="mailto:blog.gbarut@riskreduction.net">mail-128</a></li>
-                            <li><a href="http://twitter.com/GanbaruTobi">twitter</a></li>
-                            <li><a href="http://github.com/GanbaruTobi">github</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
-                </address><!-- /#about -->
-
-                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
 
 </body>
 </html>

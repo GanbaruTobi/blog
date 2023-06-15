@@ -1,112 +1,122 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Person">
 <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="generator" content="Pelican" />
+                <meta charset="utf-8">
+        <!-- Site Meta Data -->
         <title>gbaru's blog - brujin</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="gbaru">
+
+        <link rel="shortcut icon" href="">
+
+        <!-- schema.org -->
+        <meta itemprop="name" content="gbaru's blog">
+        <meta itemprop="image" content="/theme/images/icons/avatar.png">
+        <meta itemprop="description" content="">
+
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+        <!-- Style Meta Data -->
+        <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link rel="stylesheet" href="/theme/css/pygments.css" type="text/css"/>
+
+        <!-- Feed Meta Data -->
+
+        <!-- Twitter Feed -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="">
+        <meta name="twitter:image" content="">
+
+    <meta name="twitter:creator" content="">
+    <meta name="twitter:url" content="">
+    <meta name="twitter:title" content="gbaru's blog">
+    <meta name="twitter:description" content="Binary Exploitation and Red Teaming">
+
+    <!-- Facebook Meta Data -->
+    <meta property="og:title" content="gbaru's blog"/>
+    <meta property="og:description" content="Binary Exploitation and Red Teaming"/>
+    <meta property="og:image" content=""/>
+
+    <meta name="twitter:creator" content="">
+    <meta name="twitter:url" content="/tag/brujin.html">
+    <meta name="twitter:title" content="gbaru's blog ~ brujin">
+    <meta name="twitter:description" content="Articles de brujin">
+
+    <!-- Facebook Meta Data -->
+    <meta property="og:title" content="gbaru's blog ~ brujin"/>
+    <meta property="og:description" content="Articles de brujin"/>
+    <meta property="og:image" content="/theme/images/icons/avatar.png"/>
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="/">gbaru's blog</a></h1>
-                <nav><ul>
-                    <li><a href="/">Articles</a></li>
-                    <li><a href="/tags/">Tags</a></li>
-                    <li><a href="/category/general.html">General</a></li>
-                    <li><a href="/category/misc.html">Misc</a></li>
-                    <li><a href="/category/red.html">Red</a></li>
-                    <li><a href="/category/windows.html">Windows</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
+<body>
+<!-- Sidebar -->
+<aside>
+    <center><a href="/theme/images/icons/avatar.png"><img id="avatar" src="/theme/images/icons/avatar.png"></a></center>
+    <h1>gbaru's blog</h1>
+        <p>Binary Exploitation and Red Teaming</p>
+    <br>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html">De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2023-05-07T22:00:00+02:00">
-                Published: Sun 07 May 2023
-        </abbr>
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/gbaru.html">gbaru</a>
-        </address>
-<p>In <a href="/category/general.html">General</a>.</p>
-<p>tags: <a href="/tag/offset.html">offset</a> <a href="/tag/brujin.html">brujin</a> <a href="/tag/debrujin.html">debrujin</a> </p>
-</footer><!-- /.post-info --><h2>Intro</h2>
-<p>In the field of binary exploitation, it is a common occurrence to have to determine the offset of our input to a program. In early buffer overflow exploits, a large buffer of repeating characters such as "A" * 400 was often used. However, when overwriting the instruction pointer, the exact location of the overwrite was unknown.</p>
-<p>To address this issue, the technique of using ever-changing patterns was introduced. For example, a pattern like "...AAACAAADAAAE..." could be used.
-By finding the location of the instruction pointer in the pattern (imagine it pointing to "AAAD"), the offset of the input could be determined. 
-But the de bruijn pattern is even better as you might think by just this example. Because it can also give you the offset of pointing to "AADA" or "ADAA" or "DAAA", since each of this sub-parts are also unique. So any offset into the input pattern can be precisely determined.
-This technique remains an important tool in modern binary exploitation.</p>
-<h2>Tools</h2>
-<p>There are many tools available to create such patterns and calculate offsets in binary exploitation. However, I have some opinions and tips I'd like to share.</p>
-<p>One commonly used tool is the Metasploit Framework, which includes the msf-pattern-create and msf-pattern-offset commands:</p>
-<div class="highlight"><pre><span></span><code>msf-pattern-create<span class="w"> </span>-l<span class="w"> </span>&lt;length&gt;
+    <nav class="nav">
+        <ul class="list-bare">
 
-msf-pattern-offset<span class="w"> </span>-q<span class="w"> </span>&lt;pattern&gt;
-</code></pre></div>
+                <li><a class="nav__link" href="/">Articles</a></li>
+                <li><a class="nav__link" href="/tags/">Tags</a></li>
 
-<p>Although this tool is well-known and recommended by many, I personally do not prefer it due to its clunkiness and difficulty of use on Windows. Additionally, it can be flagged by antivirus software, causing additional problems.</p>
-<p>For these reasons, I prefer to use radare2 and its ragg2 tool, which works well on Windows, Linux, and Mac:</p>
-<div class="highlight"><pre><span></span><code>ragg2<span class="w"> </span>-P<span class="w"> </span>&lt;length&gt;<span class="w"> </span>-r
 
-ragg2<span class="w"> </span>-P<span class="w"> </span>&lt;length&gt;<span class="w"> </span>-q<span class="w"> </span>&lt;offset&gt;<span class="w"> </span><span class="c1"># offset as 0x....</span>
-</code></pre></div>
+        </ul>
+    </nav>
 
-<p>One limitation of ragg2 is that it can only create one pattern with a predefined alphabet. This limitation can be problematic when working with input buffers that contain so-called "bad characters" that the target program does not handle correctly.</p>
-<p>An alternative tool to overcome this limitation is pwntools pwnlib. Although its usage requires coding, it is very simple and can easily be accomplished with a few lines of code:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+    <p class="social">
+                <a href="mailto:blog.gbarut@riskreduction.net" target="_blank"><img
+                        src="/theme/images/icons/mail-128.png"></a>
+                <a href="http://twitter.com/GanbaruTobi" target="_blank"><img
+                        src="/theme/images/icons/twitter.png"></a>
+                <a href="http://github.com/GanbaruTobi" target="_blank"><img
+                        src="/theme/images/icons/github.png"></a>
+    </p>
 
-<span class="c1"># Define your custom alphabet</span>
-<span class="n">alphabet</span> <span class="o">=</span> <span class="s1">&#39;abcdefghijklmnopqrstuvwxyz&#39;</span>
+        <h2>Categories</h2>
+        <ul class="navbar">
+                <li><a
+                        href="/category/general.html">General</a></li>
+                <li><a
+                        href="/category/misc.html">Misc</a></li>
+                <li><a
+                        href="/category/red.html">Red</a></li>
+                <li><a
+                        href="/category/windows.html">Windows</a></li>
+        </ul>
 
-<span class="c1"># Generate a cyclic pattern with a length of 200 using the custom alphabet</span>
-<span class="n">pattern</span> <span class="o">=</span> <span class="n">cyclic</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+</aside>
 
-<span class="c1"># Find the offset of a later specified value in the pattern</span>
-<span class="n">offset</span> <span class="o">=</span> <span class="n">cyclic_find</span><span class="p">(</span><span class="s1">&#39;mnaa&#39;</span><span class="p">,</span> <span class="n">alphabet</span><span class="p">)</span>
+<!-- Content -->
+<article>
+    <h1 class="title"></h1>
+        <ol class="posts">
+    <h2 class="latest">Tag: brujin</h2>
+                <li class="post_list"><p class="post_entry">
+                    <h2 class="post_title"><a href="/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html" rel="bookmark"
+                                              title="Permalink to De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade">De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade</a>
+                    </h2>
+                    <a href="/author/gbaru.html">@gbaru</a>
+                    <span> in </span>
+                    <span class="post_category"><a href="/category/general.html" rel="bookmark"
+                                                   title="Permalink to General">[ General ]</a></span>
+                    <span class="post_date">Sun 07 May 2023</span>
+                </li>
+        </ol>
 
-<span class="c1"># Print the offset</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Offset: </span><span class="si">{</span><span class="n">offset</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</code></pre></div>
 
-<p>It's worth noting that Metasploit's pattern-create command does have an option (-s) for specifying a custom alphabet.</p>
-<p>Other tools such as mona.py (Python2) or PEDA (only for GDB) are also available. However, they each have limitations that make me hesitant to include them in my general toolset.</p>
-<h2>Alphabets in patterns</h2>
-<p>Lets think about the alphabets for a second. In case we have a limitation and we want to switch to other characters, just how many would we need for creating a fitting buffer?</p>
-<p>The chars in these patterns are normaly a byte wide, which means on a 32-bit system 4 chars will be filling 1 register.
-So we have alphabet size ^ 4.</p>
-<p>This comes down to</p>
-<div class="highlight"><pre><span></span><code><span class="mf">2</span><span class="w">  </span><span class="n">chars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">16</span><span class="w">    </span><span class="n">maximal</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="nb">len</span><span class="n">gth</span>
-<span class="mf">5</span><span class="w">  </span><span class="n">chars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">625</span><span class="w">   </span><span class="n">maximal</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="nb">len</span><span class="n">gth</span>
-<span class="mf">10</span><span class="w"> </span><span class="n">chars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10000</span><span class="w"> </span><span class="n">maximal</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="nb">len</span><span class="n">gth</span>
-</code></pre></div>
+</article>
 
-<p>On 64-bit systems its even easier, since it will be alphabet size ^ 8</p>                </article>
-            </aside><!-- /#featured -->
-        <section id="extras" class="body">
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
+<!-- Footer -->
+    <footer>
+        <p>
+        </p>
+    </footer>
 
-                            <li><a href="mailto:blog.gbarut@riskreduction.net">mail-128</a></li>
-                            <li><a href="http://twitter.com/GanbaruTobi">twitter</a></li>
-                            <li><a href="http://github.com/GanbaruTobi">github</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
-                </address><!-- /#about -->
-
-                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
 
 </body>
 </html>
