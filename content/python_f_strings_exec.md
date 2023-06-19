@@ -48,6 +48,7 @@ Before going on, we need to understand differences, before trying more technique
 To display the bytecode (disassembly) of a function in Python, you can utilize the dis module. The dis module offers a disassembler for Python bytecode, enabling you to examine the low-level instructions executed by the Python interpreter.
 
 Lets do this for a new-style f-string:
+
 ![dis execution](./images/disone.png)
 
 What we can see here is that test0 is not a string constant, but being evaluated at runtime. Now this sounds like an eval() code, but lets do some tests to show you that its not so easy:
@@ -91,9 +92,11 @@ print(f"This is : {tmp()}")
 ```
 
 ![lambda exec](././images/lambda2.png)
+
 So we are not abe to place something executeable into an variable with this directly. But we can define a function call... no we cannot. The call is not part of the string evaluation, as we have seen in the beginning.
 
 With a class, we can try something, but it is clear that instantiation leads to to same problems as before.
+
 ```python
 class MyClass:
     def __init__(self):
