@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Person">
+<head>
+            <meta charset="utf-8">
+        <!-- Site Meta Data -->
+        <title>Understanding Python f-Strings for RCE, Part 1</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="gbaru">
+
+        <link rel="shortcut icon" href="">
+
+        <!-- schema.org -->
+        <meta itemprop="name" content="gbaru's blog">
+        <meta itemprop="image" content="/theme/images/icons/avatar.png">
+        <meta itemprop="description" content="">
+
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+        <!-- Style Meta Data -->
+        <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+        <link rel="stylesheet" href="/theme/css/pygments.css" type="text/css"/>
+
+        <!-- Feed Meta Data -->
+
+        <!-- Twitter Feed -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="">
+        <meta name="twitter:image" content="">
+
+    <meta name="twitter:creator" content="">
+    <meta name="twitter:url" content="/understanding-python-f-strings-for-rce-part-1.html">
+    <meta name="twitter:title" content="gbaru's blog ~ Understanding Python f-Strings for RCE, Part 1">
+    <meta name="twitter:description" content="What are Python f-Strings Python f-strings, short for &#34;formatted string literals,&#34; are a convenient way to embed expressions inside string literals, allowing for easy string interpolation. F-strings were introduced in Python 3.6 and provide a concise and readable syntax for creating formatted strings. To create an f-string, you prefix …">
+
+    <!-- Facebook Meta Data -->
+    <meta property="og:title" content="gbaru's blog ~ Understanding Python f-Strings for RCE, Part 1"/>
+    <meta property="og:description" content="What are Python f-Strings Python f-strings, short for &#34;formatted string literals,&#34; are a convenient way to embed expressions inside string literals, allowing for easy string interpolation. F-strings were introduced in Python 3.6 and provide a concise and readable syntax for creating formatted strings. To create an f-string, you prefix …"/>
+    <meta property="og:image" content=""/>
+</head>
+
+<body>
+<!-- Sidebar -->
+<aside>
+    <center><a href="/theme/images/icons/avatar.png"><img id="avatar" src="/theme/images/icons/avatar.png"></a></center>
+    <h1>gbaru's blog</h1>
+        <p>Binary Exploitation and Red Teaming</p>
+    <br>
+
+
+    <nav class="nav">
+        <ul class="list-bare">
+
+                <li><a class="nav__link" href="/">Articles</a></li>
+                <li><a class="nav__link" href="/tags/">Tags</a></li>
+
+
+        </ul>
+    </nav>
+
+    <p class="social">
+                <a href="mailto:blog.gbarut@riskreduction.net" target="_blank"><img
+                        src="/theme/images/icons/mail-128.png"></a>
+                <a href="http://twitter.com/GanbaruTobi" target="_blank"><img
+                        src="/theme/images/icons/twitter.png"></a>
+                <a href="http://github.com/GanbaruTobi" target="_blank"><img
+                        src="/theme/images/icons/github.png"></a>
+    </p>
+
+        <h2>Categories</h2>
+        <ul class="navbar">
+                <li><a
+                        href="/category/general.html">General</a></li>
+                <li><a
+                        href="/category/misc.html">Misc</a></li>
+                <li class="active"><a
+                        href="/category/pentest.html">Pentest</a></li>
+                <li><a
+                        href="/category/red.html">Red</a></li>
+                <li><a
+                        href="/category/windows.html">Windows</a></li>
+        </ul>
+
+
+</aside>
+
+<!-- Content -->
+<article>
+    <section id="content">
+        <article>
+            <h2 class="post_title post_detail"><a href="/understanding-python-f-strings-for-rce-part-1.html" rel="bookmark"
+                                                  title="Permalink to Understanding Python f-Strings for RCE, Part 1">Understanding Python f-Strings for RCE, Part 1</a></h2>
+            <div class="entry-content blog-post">
+                <h2>What are Python f-Strings</h2>
+<p>Python f-strings, short for "formatted string literals," are a convenient way to embed expressions inside string literals, allowing for easy string interpolation. F-strings were introduced in Python 3.6 and provide a concise and readable syntax for creating formatted strings.</p>
+<p>To create an f-string, you prefix the string literal with the letter "f" or "F" and enclose expressions inside curly braces {}. The expressions inside the curly braces are evaluated at runtime and their values are inserted into the resulting string. Here's an example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Alice&quot;</span>
+<span class="n">age</span> <span class="o">=</span> <span class="mi">25</span>
+
+<span class="c1"># Using f-string to create a formatted string</span>
+<span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;My name is </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> and I&#39;m </span><span class="si">{</span><span class="n">age</span><span class="si">}</span><span class="s2"> years old.&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</code></pre></div>
+
+<h2>Why write about it?</h2>
+<p>Well, every now and then, we come across these functions in source code and discuss whether they pose a risk for Remote Code Execution (RCE) or not. There are links on the internet <a href="https://www.geeksforgeeks.org/vulnerability-in-str-format-in-python/">1</a>, <a href="https://github.com/adeptex/CTF/blob/master/fstring-injection.md">2</a>, and others that claim exploitability, while <a href="https://security.stackexchange.com/questions/238338/are-there-any-security-concerns-to-using-python-f-strings-with-user-input">others</a> demonstrate that it is often not the case.</p>
+<h2>Example Code</h2>
+<p>So lets review some snippets to see about the confusions.</p>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This is executed: </span><span class="si">{</span><span class="nb">print</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p><img alt="Result" src="./images/executed.png"></p>
+<p>and</p>
+<div class="highlight"><pre><span></span><code><span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot;print(1234)&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This is not: </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p><img alt="Execure and Not" src="./images/execudandnot.png"></p>
+<p>This might look very close to each other, but it seems python sees differences in it.
+Before going on, we need to understand differences, before trying more techniques.</p>
+<h2>Python under the Hood</h2>
+<p>To display the bytecode (disassembly) of a function in Python, you can utilize the dis module. The dis module offers a disassembler for Python bytecode, enabling you to examine the low-level instructions executed by the Python interpreter.</p>
+<p>Lets do this for a new-style f-string:
+<img alt="dis execution" src="./images/disone.png"></p>
+<p>What we can see here is that test0 is not a string constant, but being evaluated at runtime. Now this sounds like an eval() code, but lets do some tests to show you that its not so easy:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">dis</span>
+
+<span class="k">def</span> <span class="nf">test1</span><span class="p">():</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="nb">print</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
+    <span class="sa">f</span><span class="s2">&quot;This is executed: </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="k">def</span> <span class="nf">test2</span><span class="p">():</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot;print(1234)&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;This is not: </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="n">dis</span><span class="o">.</span><span class="n">dis</span><span class="p">(</span><span class="n">test1</span><span class="p">)</span>
+<span class="n">test1</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;----- between -----&quot;</span><span class="p">)</span>
+
+<span class="n">dis</span><span class="o">.</span><span class="n">dis</span><span class="p">(</span><span class="n">test2</span><span class="p">)</span>
+<span class="n">test2</span><span class="p">()</span>
+</code></pre></div>
+
+<p><img alt="dis execution" src="././images/disexec3.png"></p>
+<p>In test one, we can observe that the print statement is executed, but it's important not to be misled. The execution of the print statement occurs during the variable declaration line. The value stored in tmp is None, and therefore our execution evaluation is performed on nothing (since it has already been executed).</p>
+<p>In the second example, tmp is merely being formatted, and no function call occurs.</p>
+<p>If we desire a mechanism to execute code from something like f"Exec {user_input}", we need a way to provide something that is not solely interpreted as a string (LOAD CONST).</p>
+<h3>Further tests</h3>
+<p>We need to assign something to a variable that is interpreted as a function or something that triggers the execution of hidden code. I can envision two approaches to achieve this: using a lambda function or using a class.</p>
+<div class="highlight"><pre><span></span><code><span class="n">tmp</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This is not: </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">tmp</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This is : </span><span class="si">{</span><span class="n">tmp</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p><img alt="lambda exec" src="././images/lambda2.png">
+So we are not abe to place something executeable into an variable with this directly. But we can define a function call... no we cannot. The call is not part of the string evaluation, as we have seen in the beginning.</p>
+<p>With a class, we can try something, but it is clear that instantiation leads to to same problems as before.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">MyClass</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Hello, World!&quot;</span>
+
+<span class="n">tmp</span> <span class="o">=</span> <span class="n">MyClass</span> 
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This is : </span><span class="si">{</span><span class="n">tmp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This is : </span><span class="si">{</span><span class="n">tmp</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<h2>Exploitable Case</h2>
+<p>Just like <a href="https://security.stackexchange.com/questions/238338/are-there-any-security-concerns-to-using-python-f-strings-with-user-input">here</a> it is possible to exploit, but where is the difference in that example?</p>
+<p>The example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">http.server</span> <span class="kn">import</span> <span class="n">HTTPServer</span><span class="p">,</span> <span class="n">BaseHTTPRequestHandler</span>
+
+<span class="n">secret</span> <span class="o">=</span> <span class="s1">&#39;abc123&#39;</span>
+
+<span class="k">class</span> <span class="nc">Handler</span><span class="p">(</span><span class="n">BaseHTTPRequestHandler</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;funtimes&#39;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;welcome to </span><span class="si">{site.name}</span><span class="s1">&#39;</span>
+    <span class="k">def</span> <span class="nf">do_GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&lt;title&gt;&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;&lt;/title&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">site</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s1">&#39;content-type&#39;</span><span class="p">,</span> <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_headers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+
+<span class="n">HTTPServer</span><span class="p">((</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8888</span><span class="p">),</span> <span class="n">Handler</span><span class="p">)</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</code></pre></div>
+
+<p>The difference is that the attacker actually controls the string that is going to be formatted.
+So this line:</p>
+<div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&lt;title&gt;&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;&lt;/title&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">site</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+</code></pre></div>
+
+<p>will be made into something we directly control, in the example to</p>
+<div class="highlight"><pre><span></span><code><span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&lt;title&gt;&#39;</span> <span class="o">+</span> <span class="s1">&#39;XXX</span><span class="si">{site.do_GET.__globals__[secret]}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;&lt;/title&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">site</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+</code></pre></div>
+
+<p>From the provided example, people have been discussing whether the vulnerability could lead to Remote Code Execution (RCE). Let's examine what we can observe.</p>
+<p>We have control over the left part of the code, but it is being formatted based on the condition set in the right part. The code expects and will not execute without exactly one pair of {}. It intends to format the site variable with the value of self. Consequently, the code will load 'self' into 'site' and then evaluate the code.</p>
+<p>In the case of this code, this grants us full control over the Handler instance, and based on the provided solution, it is already established that accessing members is possible.</p>
+<p>Python possesses numerous magical functionalities, but we will explore them in a subsequent post.</p>
+<h2>Conclusion</h2>
+<p>It appears that there are specific cases in which formatting can lead to exploitable evaluation. Therefore, it is reasonable to consider the following approach: If the user input is parsed or manipulated only once, it is likely safe. However, if there are two or more manipulations, it might create the necessary side-effect.</p>
+<p>Even in scenarios where a side-effect is present, it remains uncertain whether it is sufficient for a complete Remote Code Execution (RCE). As a result, further exploration and investigation will be conducted in part 2 to gain more insights.</p>
+            </div>
+            <div class="post_list">
+                <span>By </span>
+                <a href="/author/gbaru.html">@gbaru</a>
+                <span> in </span>
+                <span class="post_category"><a href="/category/pentest.html" rel="bookmark"
+                                               title="Permalink to Pentest">[ Pentest ]</a></span>
+                <span class="post_date">Thu 15 June 2023</span>
+                <div><span>Tags : </span>
+                            <span><a href="/tag/python.html">#Python, </a></span>
+                            <span><a href="/tag/eval.html">#Eval, </a></span>
+                            <span><a href="/tag/f-strings.html">#f-Strings, </a></span>
+                </div>
+
+            </div>
+        </article>
+    </section>
+</article>
+
+<!-- Footer -->
+    <footer>
+        <p>
+        </p>
+    </footer>
+
+
+</body>
+</html>

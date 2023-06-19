@@ -1,6 +1,6 @@
 Title: Understanding Python f-Strings for RCE, Part 1
 Date: 2023-06-15 22:00
-Category: Rev
+Category: Pentest
 Tags: Python, Eval, f-Strings
 
 ## What are Python f-Strings
@@ -20,8 +20,7 @@ print(message)
 
 ## Why write about it?
 
-Well, every now and then, we pass by this functions in source code and discuss if its a way for RCE or not.
-There are links on the internet [1](https://www.geeksforgeeks.org/vulnerability-in-str-format-in-python/), [2](https://github.com/adeptex/CTF/blob/master/fstring-injection.md), ..., claiming exploitabilty and [others](https://security.stackexchange.com/questions/238338/are-there-any-security-concerns-to-using-python-f-strings-with-user-input) show its often not.
+Well, every now and then, we come across these functions in source code and discuss whether they pose a risk for Remote Code Execution (RCE) or not. There are links on the internet [1](https://www.geeksforgeeks.org/vulnerability-in-str-format-in-python/), [2](https://github.com/adeptex/CTF/blob/master/fstring-injection.md), and others that claim exploitability, while [others](https://security.stackexchange.com/questions/238338/are-there-any-security-concerns-to-using-python-f-strings-with-user-input) demonstrate that it is often not the case.
 
 ## Example Code
 
@@ -46,12 +45,12 @@ Before going on, we need to understand differences, before trying more technique
 
 ## Python under the Hood
 
-To display the bytecode (disassembly) of a function in Python, you can use the dis module. The dis module provides a disassembler for Python bytecode, allowing you to inspect the low-level instructions executed by the Python interpreter.
+To display the bytecode (disassembly) of a function in Python, you can utilize the dis module. The dis module offers a disassembler for Python bytecode, enabling you to examine the low-level instructions executed by the Python interpreter.
 
 Lets do this for a new-style f-string:
 ![dis execution](./images/disone.png)
 
-What we can see here is that test0 is not a string constant, but being evaluated at runtime. Now this sounds like an eval() code, but lets do some thats to show u that its not so easy:
+What we can see here is that test0 is not a string constant, but being evaluated at runtime. Now this sounds like an eval() code, but lets do some tests to show you that its not so easy:
 
 ```python
 import dis
@@ -73,17 +72,15 @@ test2()
 ```
 ![dis execution](././images/disexec3.png)
 
-In test one we can see the print being executed, but don't get mislead here, its already executed in the variable declaration line. The vaulue stored in tmp is null and therefore out execution evaluation is done on nothing (but its executed).
+In test one, we can observe that the print statement is executed, but it's important not to be misled. The execution of the print statement occurs during the variable declaration line. The value stored in tmp is None, and therefore our execution evaluation is performed on nothing (since it has already been executed).
 
-In the second example tmp is just formatted, no call happens.
+In the second example, tmp is merely being formatted, and no function call occurs.
 
-If we want to have a way to execute code from something like f" Exec {user-input}", we need a way to provide something thats not just seen as a string (LOAD CONST).
-
+If we desire a mechanism to execute code from something like f"Exec {user_input}", we need a way to provide something that is not solely interpreted as a string (LOAD CONST).
 
 ### Further tests
 
-We need to bind something to a variable that is being seen as a function or something that would have some hidden code executed. I could imagine two ways to do this. With a lambda function or with a class.
-The problem with lamda is, that it defines tmp as a function, and the function call would need tmp()
+We need to assign something to a variable that is interpreted as a function or something that triggers the execution of hidden code. I can envision two approaches to achieve this: using a lambda function or using a class.
 
 ```python
 tmp = lambda: print(1234)
@@ -130,7 +127,7 @@ class Handler(BaseHTTPRequestHandler):
 HTTPServer(('localhost', 8888), Handler).serve_forever()
 ```
 
-The difference is that the attack actually controls the string that is going to be formatted.
+The difference is that the attacker actually controls the string that is going to be formatted.
 So this line:
 
 ```python
@@ -142,15 +139,16 @@ will be made into something we directly control, in the example to
 res = ('<title>' + 'XXX{site.do_GET.__globals__[secret]}' + '</title>\n' + self.msg).format(site=self)
 ```
 
-Since from the example ppl also discussed if the vulnerabe is a RCE, lets look at what we see.
-We control the left part, but its being formated on the condition set in the right part. So the code
-expects and wont run without exactly 1 pair of {} and it want to format the site variable with the self value.
-So the code will load 'self' into 'site' and then evaluate the code. In the case of this code, this gives us full control ob the Handler instance and we allready know by the provided solution that its possible to access members.
+From the provided example, people have been discussing whether the vulnerability could lead to Remote Code Execution (RCE). Let's examine what we can observe.
 
-Python has lots of magic functionality, but thats something we will look at in a follow up post
+We have control over the left part of the code, but it is being formatted based on the condition set in the right part. The code expects and will not execute without exactly one pair of {}. It intends to format the site variable with the value of self. Consequently, the code will load 'self' into 'site' and then evaluate the code.
+
+In the case of this code, this grants us full control over the Handler instance, and based on the provided solution, it is already established that accessing members is possible.
+
+Python possesses numerous magical functionalities, but we will explore them in a subsequent post.
 
 ## Conclusion
 
-It seems that there needs to be special cases, in which formatting leads to exploitable evaluation. So I would think about it that way. If the user-Input is parsed/manipulated one time, its probably save and if there are two manipulations it might create a needed side-effect.
+It appears that there are specific cases in which formatting can lead to exploitable evaluation. Therefore, it is reasonable to consider the following approach: If the user input is parsed or manipulated only once, it is likely safe. However, if there are two or more manipulations, it might create the necessary side-effect.
 
-Even in the case of having such a side-effect, we are unsure if its enough for an full RCE. So we will keep on looking in part 2.
+Even in scenarios where a side-effect is present, it remains uncertain whether it is sufficient for a complete Remote Code Execution (RCE). As a result, further exploration and investigation will be conducted in part 2 to gain more insights.
