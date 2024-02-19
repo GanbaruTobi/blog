@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>gbaru's blog - Misc</title><link href="https://blog.riskreduction.net/" rel="alternate"></link><link href="https://blog.riskreduction.net/feeds/misc.atom.xml" rel="self"></link><id>https://blog.riskreduction.net/</id><updated>2023-05-06T22:10:00+02:00</updated><entry><title>Hello to my Blog</title><link href="https://blog.riskreduction.net/hello-to-my-blog.html" rel="alternate"></link><published>2023-05-06T22:10:00+02:00</published><updated>2023-05-06T22:10:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-05-06:/hello-to-my-blog.html</id><summary type="html">&lt;p&gt;Hello ppl,&lt;/p&gt;
+&lt;p&gt;this will be my blog, where I write about binary exploitation.
+I will focus on Windows mostly, at least till end of 2025.&lt;/p&gt;
+&lt;p&gt;Currently I work on finishing Offensive Security's OSED Course (EXP-301) and
+will have the Windows Internals Training at OffensiveCon in the mid of May.&lt;/p&gt;
+&lt;p&gt;I …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Hello ppl,&lt;/p&gt;
+&lt;p&gt;this will be my blog, where I write about binary exploitation.
+I will focus on Windows mostly, at least till end of 2025.&lt;/p&gt;
+&lt;p&gt;Currently I work on finishing Offensive Security's OSED Course (EXP-301) and
+will have the Windows Internals Training at OffensiveCon in the mid of May.&lt;/p&gt;
+&lt;p&gt;I will create a companion GitHub repository where I will store all the tools and knowledge related to the latest techniques I learn and tools I use.&lt;/p&gt;
+&lt;p&gt;Else feel free to contact me, to join forces in CTF's or in binary pwning or when u have tips for me =)&lt;/p&gt;
+&lt;p&gt;Happy Hacking&lt;/p&gt;</content><category term="Misc"></category><category term="None"></category></entry></feed>

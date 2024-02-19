@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>gbaru's blog - Windows</title><link href="https://blog.riskreduction.net/" rel="alternate"></link><link href="https://blog.riskreduction.net/feeds/windows.atom.xml" rel="self"></link><id>https://blog.riskreduction.net/</id><updated>2023-05-08T13:00:00+02:00</updated><entry><title>Preparing for Windows Internals for Security Engineers</title><link href="https://blog.riskreduction.net/preparing-for-windows-internals-for-security-engineers.html" rel="alternate"></link><published>2023-05-08T13:00:00+02:00</published><updated>2023-05-08T13:00:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-05-08:/preparing-for-windows-internals-for-security-engineers.html</id><summary type="html">&lt;p&gt;In mid of May I have the honor to participate in the Windows Internals 4-day training at OffensiveCon. Since I want to come prepared there are some things I will do beforehand. For anyone else going for the training or wanting to check out its topics this might come in …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In mid of May I have the honor to participate in the Windows Internals 4-day training at OffensiveCon. Since I want to come prepared there are some things I will do beforehand. For anyone else going for the training or wanting to check out its topics this might come in handy.&lt;/p&gt;
+&lt;h2&gt;General Preperation&lt;/h2&gt;
+&lt;p&gt;I will go with a split process of reading the new Windows Internals Books and watching the videos on Plural Sight to Windows 11 from Pavel Yosifovich (payed content). They both have the same topic, the books have more depth, but are somewhat harder and more time consuming to go through.&lt;/p&gt;
+&lt;p&gt;The videos are very good, but sometimes lack on a certain topic. Everytime one option gets boring or I find myself not progressing I switch to the other method.&lt;/p&gt;
+&lt;h2&gt;Specific Preperation&lt;/h2&gt;
+&lt;p&gt;After that I go trough the description of the training and on every buzzword I don't know of, I will research about the contents.&lt;/p&gt;
+&lt;p&gt;The buzzwords per OS version are:&lt;/p&gt;
+&lt;p&gt;Windows 11:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;GRU bootkits &lt;/li&gt;
+&lt;li&gt;PLA software supply chain implants&lt;/li&gt;
+&lt;li&gt;NSA Backdoors&lt;/li&gt;
+&lt;li&gt;Kernel Data Protection (KDP)&lt;/li&gt;
+&lt;li&gt;eXtended Control Flow Guard (XFG)&lt;/li&gt;
+&lt;li&gt;Kernel Control-flow Enforcement Technology (KCET)&lt;/li&gt;
+&lt;li&gt;System Guard Runtime Assertions&lt;/li&gt;
+&lt;li&gt;Secure Launch framework (Intel TXT and AMD SKINIT for new DRTM-based attestation)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Windows 10:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Virtual Trust Levels (VTL)&lt;/li&gt;
+&lt;li&gt;Virtualization Based Security (VBS)&lt;/li&gt;
+&lt;li&gt;Hyper Visor Code Integrity (HVCI)&lt;/li&gt;
+&lt;li&gt;Kernel Control Flow Guard (KCFG)&lt;/li&gt;
+&lt;li&gt;Software Guard Extensions (SGX)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Windows 8.1:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Protected Process Light&lt;/li&gt;
+&lt;li&gt;Custome Code Signing Policies&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Windows 8:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;AppContainer&lt;/li&gt;
+&lt;li&gt;Secure Boot&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Windows 7:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Object Manager data structures&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Resources to the Topics&lt;/h3&gt;
+&lt;p&gt;&lt;span style="color:blue"&gt;GRU Rootkits&lt;/span&gt; seems to be made up or at least I can't find anything about it. I guess GRU is something russian... or the (good) villain from minions. Anyway, its a rootkit and therefore just a kernel malware.&lt;/p&gt;
+&lt;p&gt;Sadly again, no idea what &lt;span style="color:blue"&gt;PLA&lt;/span&gt; stands for. But its about supply chain attacks. I don't see how preparation for that would help me for the course.&lt;/p&gt;
+&lt;p&gt;&lt;span style="color:blue"&gt;NSA Backdoors&lt;/span&gt; is at least something known. So the text goes on to describe the above three as kernel and firmware malware.&lt;/p&gt;
+&lt;p&gt;My understanding is its about modified kernels or drivers.
+Therefore preparing would be to learn about offensive driver development (they run in the kernel). I took the course from &lt;a href="https://training.zeropointsecurity.co.uk/courses/offensive-driver-development"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Also there is a book from Pavel about Windows Kernel Programming, which I will go through.&lt;/p&gt;
+&lt;p&gt;Next we have &lt;span style="color:blue"&gt;Kernel Data Protection (KDP)&lt;/span&gt;. It is explained &lt;a href="https://www.microsoft.com/en-us/security/blog/2020/07/08/introducing-kernel-data-protection-a-new-platform-security-technology-for-preventing-data-corruption/"&gt;here&lt;/a&gt;. It is a mechanism to mark parts of kernel and driver as read only data. A copy or other way of attestation of the data is hold in the hypervisor through VBS (read on for VBS).&lt;/p&gt;
+&lt;p&gt;For &lt;span style="color:blue"&gt;eXtended Control Flow Guard (XFG)&lt;/span&gt; a good start is &lt;a href="https://connormcgarr.github.io/examining-xfg/"&gt;here&lt;/a&gt;, followed with &lt;a href="https://www.offsec.com/offsec/extended-flow-guard/"&gt;that&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;span style="color:blue"&gt;Kernel Control-flow Enforcement Technology (KCET)&lt;/span&gt; seems to be very new. I just read about normal CET &lt;a href="https://windows-internals.com/cet-on-windows/"&gt;here&lt;/a&gt; to get a basic understanding.
+It uses a "Shadow Stack" which holds a copy of all return addresses used by the program. That way its not possible to overwrite the return address of a function without being noticed. I would assume that a shadow stack in a hypervisor will do the same for the kernel.&lt;/p&gt;
+&lt;p&gt;&lt;span style="color:blue"&gt;System Guard Runtime Attestation&lt;/span&gt; is written about &lt;a href="https://www.microsoft.com/en-us/security/blog/2018/04/19/introducing-windows-defender-system-guard-runtime-attestation/"&gt;here&lt;/a&gt;  &lt;/p&gt;
+&lt;p&gt;&lt;span style="color:blue"&gt;Secure Launch framework&lt;/span&gt; seems to be for secure boot.
+I am not interested so much, but &lt;a href="https://community.amd.com/t5/business/amd-and-microsoft-secured-core-pc/ba-p/418204"&gt;here&lt;/a&gt; is good information.&lt;/p&gt;
+&lt;p&gt;From here on everything is in the Windows Internals Books, which should be a very good reference.&lt;/p&gt;</content><category term="Windows"></category><category term="OffensiveCon"></category><category term="Windows Internals"></category><category term="Yarden Shafir"></category></entry></feed>

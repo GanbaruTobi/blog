@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>gbaru's blog - General</title><link href="https://blog.riskreduction.net/" rel="alternate"></link><link href="https://blog.riskreduction.net/feeds/general.atom.xml" rel="self"></link><id>https://blog.riskreduction.net/</id><updated>2023-05-07T22:00:00+02:00</updated><entry><title>De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade</title><link href="https://blog.riskreduction.net/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html" rel="alternate"></link><published>2023-05-07T22:00:00+02:00</published><updated>2023-05-07T22:00:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-05-07:/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html</id><summary type="html">&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;In the field of binary exploitation, it is a common occurrence to have to determine the offset of our input to a program. In early buffer overflow exploits, a large buffer of repeating characters such as "A" * 400 was often used. However, when overwriting the instruction pointer, the exact …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;In the field of binary exploitation, it is a common occurrence to have to determine the offset of our input to a program. In early buffer overflow exploits, a large buffer of repeating characters such as "A" * 400 was often used. However, when overwriting the instruction pointer, the exact location of the overwrite was unknown.&lt;/p&gt;
+&lt;p&gt;To address this issue, the technique of using ever-changing patterns was introduced. For example, a pattern like "...AAACAAADAAAE..." could be used.
+By finding the location of the instruction pointer in the pattern (imagine it pointing to "AAAD"), the offset of the input could be determined. 
+But the de bruijn pattern is even better as you might think by just this example. Because it can also give you the offset of pointing to "AADA" or "ADAA" or "DAAA", since each of this sub-parts are also unique. So any offset into the input pattern can be precisely determined.
+This technique remains an important tool in modern binary exploitation.&lt;/p&gt;
+&lt;h2&gt;Tools&lt;/h2&gt;
+&lt;p&gt;There are many tools available to create such patterns and calculate offsets in binary exploitation. However, I have some opinions and tips I'd like to share.&lt;/p&gt;
+&lt;p&gt;One commonly used tool is the Metasploit Framework, which includes the msf-pattern-create and msf-pattern-offset commands:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;msf-pattern-create&lt;span class="w"&gt; &lt;/span&gt;-l&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;length&amp;gt;
+
+msf-pattern-offset&lt;span class="w"&gt; &lt;/span&gt;-q&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;pattern&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Although this tool is well-known and recommended by many, I personally do not prefer it due to its clunkiness and difficulty of use on Windows. Additionally, it can be flagged by antivirus software, causing additional problems.&lt;/p&gt;
+&lt;p&gt;For these reasons, I prefer to use radare2 and its ragg2 tool, which works well on Windows, Linux, and Mac:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ragg2&lt;span class="w"&gt; &lt;/span&gt;-P&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;length&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;-r
+
+ragg2&lt;span class="w"&gt; &lt;/span&gt;-P&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;length&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;-q&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;offset&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# offset as 0x....&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;One limitation of ragg2 is that it can only create one pattern with a predefined alphabet. This limitation can be problematic when working with input buffers that contain so-called "bad characters" that the target program does not handle correctly.&lt;/p&gt;
+&lt;p&gt;An alternative tool to overcome this limitation is pwntools pwnlib. Although its usage requires coding, it is very simple and can easily be accomplished with a few lines of code:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pwn&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Define your custom alphabet&lt;/span&gt;
+&lt;span class="n"&gt;alphabet&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;abcdefghijklmnopqrstuvwxyz&amp;#39;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Generate a cyclic pattern with a length of 200 using the custom alphabet&lt;/span&gt;
+&lt;span class="n"&gt;pattern&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cyclic&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alphabet&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pattern&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Find the offset of a later specified value in the pattern&lt;/span&gt;
+&lt;span class="n"&gt;offset&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cyclic_find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;mnaa&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alphabet&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Print the offset&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Offset: &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;offset&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;It's worth noting that Metasploit's pattern-create command does have an option (-s) for specifying a custom alphabet.&lt;/p&gt;
+&lt;p&gt;Other tools such as mona.py (Python2) or PEDA (only for GDB) are also available. However, they each have limitations that make me hesitant to include them in my general toolset.&lt;/p&gt;
+&lt;h2&gt;Alphabets in patterns&lt;/h2&gt;
+&lt;p&gt;Lets think about the alphabets for a second. In case we have a limitation and we want to switch to other characters, just how many would we need for creating a fitting buffer?&lt;/p&gt;
+&lt;p&gt;The chars in these patterns are normaly a byte wide, which means on a 32-bit system 4 chars will be filling 1 register.
+So we have alphabet size ^ 4.&lt;/p&gt;
+&lt;p&gt;This comes down to&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;2&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;chars&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;16&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;maximal&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="n"&gt;gth&lt;/span&gt;
+&lt;span class="mf"&gt;5&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;chars&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;625&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="n"&gt;maximal&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="n"&gt;gth&lt;/span&gt;
+&lt;span class="mf"&gt;10&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;chars&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;10000&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;maximal&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="n"&gt;gth&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On 64-bit systems its even easier, since it will be alphabet size ^ 8&lt;/p&gt;</content><category term="General"></category><category term="offset"></category><category term="brujin"></category><category term="debrujin"></category></entry></feed>

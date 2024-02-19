@@ -96,7 +96,6 @@ print(f"This is : {tmp()}")
 So we are not abe to place something executeable into an variable with this directly. But we can define a function call... no we cannot. The call is not part of the string evaluation, as we have seen in the beginning.
 
 With a class, we can try something, but it is clear that instantiation leads to to same problems as before.
-
 ```python
 class MyClass:
     def __init__(self):
