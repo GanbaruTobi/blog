@@ -1,5 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>gbaru's blog</title><link href="https://blog.riskreduction.net/" rel="alternate"></link><link href="https://blog.riskreduction.net/feeds/all.atom.xml" rel="self"></link><id>https://blog.riskreduction.net/</id><updated>2023-06-15T22:00:00+02:00</updated><entry><title>Understanding Python f-Strings for RCE, Part 1</title><link href="https://blog.riskreduction.net/understanding-python-f-strings-for-rce-part-1.html" rel="alternate"></link><published>2023-06-15T22:00:00+02:00</published><updated>2023-06-15T22:00:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-06-15:/understanding-python-f-strings-for-rce-part-1.html</id><summary type="html">&lt;h2&gt;What are Python f-Strings&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>gbaru's blog</title><link href="https://blog.riskreduction.net/" rel="alternate"></link><link href="https://blog.riskreduction.net/feeds/all.atom.xml" rel="self"></link><id>https://blog.riskreduction.net/</id><updated>2024-02-20T13:00:00+01:00</updated><entry><title>Fuzzing for Windows (1) - First Thoughts and Fuzzer Selection</title><link href="https://blog.riskreduction.net/fuzzing-for-windows-1-first-thoughts-and-fuzzer-selection.html" rel="alternate"></link><published>2024-02-20T13:00:00+01:00</published><updated>2024-02-20T13:00:00+01:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2024-02-20:/fuzzing-for-windows-1-first-thoughts-and-fuzzer-selection.html</id><summary type="html">&lt;h2&gt;Whats the goal&lt;/h2&gt;
+&lt;p&gt;We want to find the best multi-purpose fuzzers which are state-of-the-art. They are supposed to run inside of Windows or work with Windows VMs as targets.&lt;/p&gt;
+&lt;h2&gt;Initial Selection&lt;/h2&gt;
+&lt;p&gt;The fuzzers I found which are worth having a look at are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/googleprojectzero/winafl"&gt;WinAFL&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/sslab-gatech/winnie"&gt;Winnie&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/googleprojectzero/Jackalope"&gt;Jackalope&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/nyx-fuzz"&gt;nyx&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/0dayResearchLab/msFuzz"&gt;msfuzz&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/0vercl0k/wtf"&gt;What the …&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;h2&gt;Whats the goal&lt;/h2&gt;
+&lt;p&gt;We want to find the best multi-purpose fuzzers which are state-of-the-art. They are supposed to run inside of Windows or work with Windows VMs as targets.&lt;/p&gt;
+&lt;h2&gt;Initial Selection&lt;/h2&gt;
+&lt;p&gt;The fuzzers I found which are worth having a look at are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/googleprojectzero/winafl"&gt;WinAFL&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/sslab-gatech/winnie"&gt;Winnie&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/googleprojectzero/Jackalope"&gt;Jackalope&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/nyx-fuzz"&gt;nyx&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/0dayResearchLab/msFuzz"&gt;msfuzz&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/0vercl0k/wtf"&gt;What the fuzz&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/AFLplusplus/LibAFL"&gt;LibAFL&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/libfuzzer_windows_asan"&gt;LibAFL-Windows&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/frida_gdiplus"&gt;LibAFL-frida&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/nyx_libxml2_parallel"&gt;LibAFL-nyx&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/qemu_systemmode"&gt;LibAFL-Qemu (Systemmode)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/qemu_coverage"&gt;LibAFL-Qemu (Usermode)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Overview&lt;/h2&gt;
+&lt;p&gt;The selection hold different kind of fuzzers which will operate on user mode or kernel mode. Since on Windows it is more common to not hold the source code of targets, so most of these fuzzers will have a way to intrument binaries without source-code. &lt;/p&gt;
+&lt;p&gt;Else, we are using at least coverage-guided fuzzers. Some will be snapshot fuzzers, which will allow us to hold a bit of state more.&lt;/p&gt;
+&lt;p&gt;We lack capabilities for anything of complex states, so fuzzing a protocol, for example, is not directly solveable with this basis. It's achievable with more development (but a hard task). I recommend if u want to follow along, that u open all the fuzzers' pages and see if you come to the same conclusions as I do. This is just a fast look over for now. After we have some initial choosings, we will look deeper into the features.&lt;/p&gt;
+&lt;h2&gt;WinAFL&lt;/h2&gt;
+&lt;p&gt;Since the original AFL is designed for Unix systems, this is a version that achieves instrumentation through these four methods:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Dynamic instrumentation using DynamoRIO (http://dynamorio.org/)&lt;/li&gt;
+&lt;li&gt;Dynamic instrumentation using TinyInst (https://github.com/googleprojectzero/TinyInst)&lt;/li&gt;
+&lt;li&gt;Hardware tracing using Intel PT&lt;/li&gt;
+&lt;li&gt;Static instrumentation via Syzygy&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;DynamoRIO is able to do instrumentation very well, but can be complex to setup. TinyInst is only able to do minimal instrumentation but is easy to setup. I did not use Intel PT yet, but it will need a (modern) Intel CPU.
+&lt;a href="https://github.com/google/syzygy"&gt;Syzygy&lt;/a&gt; is archived and therefore I will not even consider it.&lt;/p&gt;
+&lt;p&gt;Else the code-base is antique, its many years old with little updates, most of the code is between 2 and 7 years old. I am sure its not worth considering because the speed and functionaly with other tools should be way better.&lt;/p&gt;
+&lt;h2&gt;Winnie&lt;/h2&gt;
+&lt;p&gt;Winnie is developed on top of the basis WinAFL gives. It is able to create something comparable to a fork() to drastically improve useability. But still this code is old (3 years) and is only tested against one fixed version of windows. &lt;/p&gt;
+&lt;p&gt;Therefore I have nothing to say besides we will probably skip over this fuzzer too.&lt;/p&gt;
+&lt;h2&gt;Jackalope&lt;/h2&gt;
+&lt;p&gt;The Jackalope fuzzer works with TinyInst and therefore is able to do basic (blackbox) binary instrumentation. It also sees close to no development, last commit is 8 months old, and therefore is just a bit better than the previous options.
+It allows for parallel fuzzing and has a grammar mutator.&lt;/p&gt;
+&lt;p&gt;I still believe we can do better and this probably won't come out to be a real option.&lt;/p&gt;
+&lt;h2&gt;kAFL&lt;/h2&gt;
+&lt;p&gt;The actively maintaned kAFL is a fuzzer coming directly from Intel it seems. Therefore instrumentation/tracing is done with Intel PT.
+Other than that is seems to have many features and claims to be able to fuzz user and kernel mode on Windows.&lt;/p&gt;
+&lt;p&gt;It works by instrumenting VMs based on QEMU/KVM. It also seems to support nesting, which would allow hypervisor-fuzzing probably. On the other hand having to run QEMU for userland fuzzing means to have an unwanted ressource cost. For kernel this is probably pretty optimal for us. Else they have an example for windows user and kernel mode fuzzing &lt;a href="https://intellabs.github.io/kAFL/tutorials/windows/index.html"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;It needs a linux host system with a modified kernel.&lt;/p&gt;
+&lt;p&gt;It incoporates nyx which we will look at next.&lt;/p&gt;
+&lt;h2&gt;nyx-fuzz&lt;/h2&gt;
+&lt;p&gt;Now we come to our first actively maintained framework/fuzzer. Nyx is a framework that allows to snapshot QEMU VMs, while nyx is acting as a hypervisor, and also provides a way for the instrumentation. Meaning the fuzzer can hold a state of an input and keep going from there not having to go through all of the programm-steps with every iteration.
+This leads to having very good speeds with complex targets.&lt;/p&gt;
+&lt;p&gt;As meantioned before nyx is ?now? also part of kAFL.
+In the terminology of nyx: nyx is the backend (handler of target) and kAFL (fuzzer) is a frontend. &lt;/p&gt;
+&lt;p&gt;nyx also brings its own fuzzer Spec-Fuzzer, which seems to work with some kind of specification files, which is probably nothing I would like to work with. Also on first glance I didn't see any documentation, so will skip for now and only come back if neccessary.&lt;/p&gt;
+&lt;p&gt;Another nyx frontend is also accessible over LibAFL, we will talk later about LibAFL soon!&lt;/p&gt;
+&lt;h2&gt;msFuzz&lt;/h2&gt;
+&lt;p&gt;msFuzz builds on top of nyx/kAFL and therefore will work with Intel PT and QEMU. The host has to be Linux. Sadly the documentation about the internals is in some Asian language.
+Whats clear is that this fuzzer is designed for Drivers using IOCTL, a common communication point between user and kernel mode. This is something we surely want to fuzz.&lt;/p&gt;
+&lt;p&gt;They seem to use angr, which is for symbolic execution. angr should be a rather inperformant choice here, but often fuzzers don't realy have any working or an next to impossible to build symex solution. So I see it as an feature to have.&lt;/p&gt;
+&lt;p&gt;It seems actively maintained for now. This fuzzer will land on my nice to have list.&lt;/p&gt;
+&lt;h2&gt;What the fuzz&lt;/h2&gt;
+&lt;p&gt;wtf is realy something. Since the other incorporate lots of work from each other, wtf seems to be a fuzzer build from ground up. It runs on Windows and Linux, it supports three types of execution environments (bochscpu, Hyper-V, KVM). It has coverage-guidance and snapshot-fuzzing. It brings some tools for triaging.
+What is unclear for me is if it brings ASan or other memory sanitizers, or if it just will act upon a crash.&lt;/p&gt;
+&lt;p&gt;The initial setup process is described as being some work. But this fuzzer seems like a realy good starting ground for user and kernelmode fuzzing of most of the things. It is actively maintained and the development process is documented as are some fuzzing cases.&lt;/p&gt;
+&lt;h2&gt;LibALF&lt;/h2&gt;
+&lt;p&gt;LibAFL is a huge deal realy. It is also a framework, coming from the developers of AFL++. Since years of experience and a huge community goes into this project it is the most feature-rich out there probably. LibAFL brings components to stick fuzzers together. Therefore we can do whitebox/blackbox, we can instrument with TinyInst, QEMU, frida, ...&lt;/p&gt;
+&lt;p&gt;The downside in my eye is that they do alot and therefore often details are not clear. Documentation is minimal. I often build fuzzer from there examples and fail in the process, because something on another used component changed or the tooling is not described well, or, or ,or ...&lt;/p&gt;
+&lt;p&gt;Therefore its a gamble if we have strikt time restrictions. But if we are able to wait some days, tickets are probably looked at and problems are resolved or at least some context is given.&lt;/p&gt;
+&lt;p&gt;We have all we wish for, but we would have to stick fuzzers together our selfs.
+Lets go through some possible ways to use this.&lt;/p&gt;
+&lt;h3&gt;LibAFL-Windows&lt;/h3&gt;
+&lt;p&gt;Not an officialy name, LibAFL supports building fuzzer for windows in some way. Its not tested as much, but fuzzers can be build. So seeing a fuzzer in the examples named &lt;a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/libfuzzer_windows_asan"&gt;libfuzzer_windows_asan&lt;/a&gt; seems like something to build. Sadly it did not build, but I went to the fuzzing discord and other people helped me resolve the problems. Building some other fuzzer worked, some didn't. So this could be used at least for whitebox fuzzing with some work.&lt;/p&gt;
+&lt;h3&gt;LibAFL-frida&lt;/h3&gt;
+&lt;p&gt;Injecting frida into processes will allow us to fuzz a good amount of software with relatively no work. This will only work for usermode is my guess. Else frida might fail for hard to track reasons and my experience with other frida-fuzzer lead me to believe that its not very reliable. Especially I am unsure about the amount of development going into frida for windows. &lt;a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/frida_gdiplus"&gt;Here&lt;/a&gt; is an example fuzzer. The work is super new, so I expect bugs but lets see.
+Since AFL++ had memory sanitizer for frida, I think they made that happen again. This could be a useful tool for us if tests show it's working.&lt;/p&gt;
+&lt;h3&gt;LibAFl-nyx&lt;/h3&gt;
+&lt;p&gt;As talked about before, LibAFL can be a frontend for nyx. Therefore we can do snapshot-fuzzing with QEMU. &lt;a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/nyx_libxml2_parallel"&gt;Here&lt;/a&gt; is an example fuzzer.&lt;/p&gt;
+&lt;h3&gt;LibAFL-Qemu&lt;/h3&gt;
+&lt;p&gt;LibAFL wants to bring their own QEMU-mode. This will use QEMU in its Emulator mode, not like nyx as a virtual machine. This will allow for way better coverage, but at a cost of speed. The community makes quite the effort to make it happen. &lt;a href="https://media.ccc.de/v/37c3-12102-fuzz_everything_everywhere_all_at_once/oembed"&gt;Here is a CCC-Talk about it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;So there is two modes for now, &lt;a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/qemu_coverage"&gt;LibAFL-Qemu (Usermode)&lt;/a&gt; and &lt;a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/qemu_systemmode"&gt;LibAFL-Qemu (Systemmode)&lt;/a&gt;. The Systemmode is still not released, but should come soon.&lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;There is way less good variety as I expected but we will go on with looking into nyx/kafl, msFuzz, wtf, LibAFL. I think WinAFL, Winnie and Jackalope are all superseded by LibAFL easily.&lt;/p&gt;
+&lt;p&gt;This means we have just one and a half option to run on windows (wtf, LibAFL) and three fuzzers will work with snapshot-fuzzing. With LibAFL, we have great tooling at our hand, but we don't get a great generic fuzzer gifted, we will have to build it together still.&lt;/p&gt;</content><category term="windows"></category><category term="windows"></category><category term="fuzzing"></category></entry><entry><title>Understanding Python f-Strings for RCE, Part 1</title><link href="https://blog.riskreduction.net/understanding-python-f-strings-for-rce-part-1.html" rel="alternate"></link><published>2023-06-15T22:00:00+02:00</published><updated>2023-06-15T22:00:00+02:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2023-06-15:/understanding-python-f-strings-for-rce-part-1.html</id><summary type="html">&lt;h2&gt;What are Python f-Strings&lt;/h2&gt;
 &lt;p&gt;Python f-strings, short for "formatted string literals," are a convenient way to embed expressions inside string literals, allowing for easy string interpolation. F-strings were introduced in Python 3.6 and provide a concise and readable syntax for creating formatted strings.&lt;/p&gt;
 &lt;p&gt;To create an f-string, you prefix …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;What are Python f-Strings&lt;/h2&gt;
 &lt;p&gt;Python f-strings, short for "formatted string literals," are a convenient way to embed expressions inside string literals, allowing for easy string interpolation. F-strings were introduced in Python 3.6 and provide a concise and readable syntax for creating formatted strings.&lt;/p&gt;

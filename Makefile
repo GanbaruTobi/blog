@@ -1,5 +1,5 @@
 PY?=
-PELICAN?=pelican
+PELICAN?="python3 -m pelican"
 PELICANOPTS= 
 
 THEME=${BASEDIR}/pelican-blue
@@ -54,19 +54,19 @@ help:
 	@echo '                                                                          '
 
 html:
-	"$(PELICAN)" "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(CONFFILE)" -t $(THEME) $(PELICANOPTS)
+	"$(PELICAN)" "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(CONFFILE)" -t "$(THEME)" $(PELICANOPTS)
 
 clean:
 	[ ! -d "$(OUTPUTDIR)" ] || rm -rf "$(OUTPUTDIR)"
 
 regenerate:
-	"$(PELICAN)" -r "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(CONFFILE)" -t $(THEME)  $(PELICANOPTS)
+	"$(PELICAN)" -r "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(CONFFILE)" -t "$(THEME)"  $(PELICANOPTS)
 
 serve:
-	"$(PELICAN)" -l "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(CONFFILE)" -t $(THEME) 
+	"$(PELICAN)" -l "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(CONFFILE)" -t "$(THEME)" 
 
 serve-global:
-	"$(PELICAN)" -l "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(CONFFILE)" -t $(THEME) $(PELICANOPTS) -b $(SERVER)
+	"$(PELICAN)" -l "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(CONFFILE)" -t "$(THEME)" $(PELICANOPTS) -b $(SERVER)
 
 devserver:
 	"$(PELICAN)" -lr "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(CONFFILE)" $(PELICANOPTS)
@@ -75,10 +75,13 @@ devserver-global:
 	$(PELICAN) -lr $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS) -b 0.0.0.0
 
 publish:
-	"$(PELICAN)" "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(PUBLISHCONF)" -t $(THEME) $(PELICANOPTS)
+	"$(PELICAN)" "$(INPUTDIR)" -o "$(OUTPUTDIR)" -s "$(PUBLISHCONF)" -t "$(THEME)" $(PELICANOPTS)
 
 ssh_upload: publish
-	scp -P $(SSH_PORT) -r "$(BASEDIR)"/* "$(SSH_USER)@$(SSH_HOST):$(SSH_TARGET_DIR)"
+	scp -P $(SSH_PORT) -r "$(BASEDIR)/*" "$(SSH_USER)@$(SSH_HOST):$(SSH_TARGET_DIR)"
+	
+ssh_upload_win:
+	C:\Windows\System32\OpenSSH\scp.exe -P $(SSH_PORT) -r "$(BASEDIR)" $(SSH_USER)@$(SSH_HOST):"$(SSH_TARGET_DIR)"
 
 sftp_upload: publish
 	printf 'put -r $(OUTPUTDIR)/*' | sftp $(SSH_USER)@$(SSH_HOST):$(SSH_TARGET_DIR)

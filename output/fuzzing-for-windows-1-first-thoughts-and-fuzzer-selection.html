@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Person">
+<head>
+            <meta charset="utf-8">
+        <!-- Site Meta Data -->
+        <title>Fuzzing for Windows (1) - First Thoughts and Fuzzer Selection</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="gbaru">
+
+        <link rel="shortcut icon" href="">
+
+        <!-- schema.org -->
+        <meta itemprop="name" content="gbaru's blog">
+        <meta itemprop="image" content="/theme/images/icons/avatar.png">
+        <meta itemprop="description" content="">
+
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+        <!-- Style Meta Data -->
+        <link rel="stylesheet" href="https://blog.riskreduction.net/theme/css/style.css" type="text/css"/>
+        <link rel="stylesheet" href="https://blog.riskreduction.net/theme/css/pygments.css" type="text/css"/>
+
+        <!-- Feed Meta Data -->
+            <link href="https://blog.riskreduction.net/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+                  title="gbaru's blog ATOM Feed"/>
+
+        <!-- Twitter Feed -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="">
+        <meta name="twitter:image" content="">
+
+    <meta name="twitter:creator" content="">
+    <meta name="twitter:url" content="https://blog.riskreduction.net/fuzzing-for-windows-1-first-thoughts-and-fuzzer-selection.html">
+    <meta name="twitter:title" content="gbaru's blog ~ Fuzzing for Windows (1) - First Thoughts and Fuzzer Selection">
+    <meta name="twitter:description" content="Whats the goal We want to find the best multi-purpose fuzzers which are state-of-the-art. They are supposed to run inside of Windows or work with Windows VMs as targets. Initial Selection The fuzzers I found which are worth having a look at are: WinAFL Winnie Jackalope nyx msfuzz What the …">
+
+    <!-- Facebook Meta Data -->
+    <meta property="og:title" content="gbaru's blog ~ Fuzzing for Windows (1) - First Thoughts and Fuzzer Selection"/>
+    <meta property="og:description" content="Whats the goal We want to find the best multi-purpose fuzzers which are state-of-the-art. They are supposed to run inside of Windows or work with Windows VMs as targets. Initial Selection The fuzzers I found which are worth having a look at are: WinAFL Winnie Jackalope nyx msfuzz What the …"/>
+    <meta property="og:image" content=""/>
+</head>
+
+<body>
+<!-- Sidebar -->
+<aside>
+    <center><a href="/theme/images/icons/avatar.png"><img id="avatar" src="/theme/images/icons/avatar.png"></a></center>
+    <h1>gbaru's blog</h1>
+        <p>Binary Exploitation and Red Teaming</p>
+    <br>
+
+
+    <nav class="nav">
+        <ul class="list-bare">
+
+                <li><a class="nav__link" href="/">Articles</a></li>
+                <li><a class="nav__link" href="/tags/">Tags</a></li>
+
+
+        </ul>
+    </nav>
+
+    <p class="social">
+                <a href="mailto:blog.gbarut@riskreduction.net" target="_blank"><img
+                        src="https://blog.riskreduction.net/theme/images/icons/mail-128.png"></a>
+                <a href="http://twitter.com/GanbaruTobi" target="_blank"><img
+                        src="https://blog.riskreduction.net/theme/images/icons/twitter.png"></a>
+                <a href="http://github.com/GanbaruTobi" target="_blank"><img
+                        src="https://blog.riskreduction.net/theme/images/icons/github.png"></a>
+            <a href="https://blog.riskreduction.net/feeds/all.atom.xml" rel="alternate">
+                <img src="https://blog.riskreduction.net/theme/images/icons/rss.png"></a>
+    </p>
+
+        <h2>Categories</h2>
+        <ul class="navbar">
+                <li><a
+                        href="https://blog.riskreduction.net/category/general.html">General</a></li>
+                <li><a
+                        href="https://blog.riskreduction.net/category/misc.html">Misc</a></li>
+                <li><a
+                        href="https://blog.riskreduction.net/category/pentest.html">Pentest</a></li>
+                <li><a
+                        href="https://blog.riskreduction.net/category/red.html">Red</a></li>
+                <li class="active"><a
+                        href="https://blog.riskreduction.net/category/windows.html">windows</a></li>
+        </ul>
+
+
+</aside>
+
+<!-- Content -->
+<article>
+    <section id="content">
+        <article>
+            <h2 class="post_title post_detail"><a href="https://blog.riskreduction.net/fuzzing-for-windows-1-first-thoughts-and-fuzzer-selection.html" rel="bookmark"
+                                                  title="Permalink to Fuzzing for Windows (1) - First Thoughts and Fuzzer Selection">Fuzzing for Windows (1) - First Thoughts and Fuzzer Selection</a></h2>
+            <div class="entry-content blog-post">
+                <h2>Whats the goal</h2>
+<p>We want to find the best multi-purpose fuzzers which are state-of-the-art. They are supposed to run inside of Windows or work with Windows VMs as targets.</p>
+<h2>Initial Selection</h2>
+<p>The fuzzers I found which are worth having a look at are:</p>
+<ul>
+<li><a href="https://github.com/googleprojectzero/winafl">WinAFL</a></li>
+<li><a href="https://github.com/sslab-gatech/winnie">Winnie</a></li>
+<li><a href="https://github.com/googleprojectzero/Jackalope">Jackalope</a></li>
+<li><a href="https://github.com/nyx-fuzz">nyx</a></li>
+<li><a href="https://github.com/0dayResearchLab/msFuzz">msfuzz</a></li>
+<li><a href="https://github.com/0vercl0k/wtf">What the fuzz</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL">LibAFL</a><ul>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/libfuzzer_windows_asan">LibAFL-Windows</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/frida_gdiplus">LibAFL-frida</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/nyx_libxml2_parallel">LibAFL-nyx</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/qemu_systemmode">LibAFL-Qemu (Systemmode)</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/qemu_coverage">LibAFL-Qemu (Usermode)</a></li>
+</ul>
+</li>
+</ul>
+<h2>Overview</h2>
+<p>The selection hold different kind of fuzzers which will operate on user mode or kernel mode. Since on Windows it is more common to not hold the source code of targets, so most of these fuzzers will have a way to intrument binaries without source-code. </p>
+<p>Else, we are using at least coverage-guided fuzzers. Some will be snapshot fuzzers, which will allow us to hold a bit of state more.</p>
+<p>We lack capabilities for anything of complex states, so fuzzing a protocol, for example, is not directly solveable with this basis. It's achievable with more development (but a hard task). I recommend if u want to follow along, that u open all the fuzzers' pages and see if you come to the same conclusions as I do. This is just a fast look over for now. After we have some initial choosings, we will look deeper into the features.</p>
+<h2>WinAFL</h2>
+<p>Since the original AFL is designed for Unix systems, this is a version that achieves instrumentation through these four methods:</p>
+<ul>
+<li>Dynamic instrumentation using DynamoRIO (http://dynamorio.org/)</li>
+<li>Dynamic instrumentation using TinyInst (https://github.com/googleprojectzero/TinyInst)</li>
+<li>Hardware tracing using Intel PT</li>
+<li>Static instrumentation via Syzygy</li>
+</ul>
+<p>DynamoRIO is able to do instrumentation very well, but can be complex to setup. TinyInst is only able to do minimal instrumentation but is easy to setup. I did not use Intel PT yet, but it will need a (modern) Intel CPU.
+<a href="https://github.com/google/syzygy">Syzygy</a> is archived and therefore I will not even consider it.</p>
+<p>Else the code-base is antique, its many years old with little updates, most of the code is between 2 and 7 years old. I am sure its not worth considering because the speed and functionaly with other tools should be way better.</p>
+<h2>Winnie</h2>
+<p>Winnie is developed on top of the basis WinAFL gives. It is able to create something comparable to a fork() to drastically improve useability. But still this code is old (3 years) and is only tested against one fixed version of windows. </p>
+<p>Therefore I have nothing to say besides we will probably skip over this fuzzer too.</p>
+<h2>Jackalope</h2>
+<p>The Jackalope fuzzer works with TinyInst and therefore is able to do basic (blackbox) binary instrumentation. It also sees close to no development, last commit is 8 months old, and therefore is just a bit better than the previous options.
+It allows for parallel fuzzing and has a grammar mutator.</p>
+<p>I still believe we can do better and this probably won't come out to be a real option.</p>
+<h2>kAFL</h2>
+<p>The actively maintaned kAFL is a fuzzer coming directly from Intel it seems. Therefore instrumentation/tracing is done with Intel PT.
+Other than that is seems to have many features and claims to be able to fuzz user and kernel mode on Windows.</p>
+<p>It works by instrumenting VMs based on QEMU/KVM. It also seems to support nesting, which would allow hypervisor-fuzzing probably. On the other hand having to run QEMU for userland fuzzing means to have an unwanted ressource cost. For kernel this is probably pretty optimal for us. Else they have an example for windows user and kernel mode fuzzing <a href="https://intellabs.github.io/kAFL/tutorials/windows/index.html">here</a>.</p>
+<p>It needs a linux host system with a modified kernel.</p>
+<p>It incoporates nyx which we will look at next.</p>
+<h2>nyx-fuzz</h2>
+<p>Now we come to our first actively maintained framework/fuzzer. Nyx is a framework that allows to snapshot QEMU VMs, while nyx is acting as a hypervisor, and also provides a way for the instrumentation. Meaning the fuzzer can hold a state of an input and keep going from there not having to go through all of the programm-steps with every iteration.
+This leads to having very good speeds with complex targets.</p>
+<p>As meantioned before nyx is ?now? also part of kAFL.
+In the terminology of nyx: nyx is the backend (handler of target) and kAFL (fuzzer) is a frontend. </p>
+<p>nyx also brings its own fuzzer Spec-Fuzzer, which seems to work with some kind of specification files, which is probably nothing I would like to work with. Also on first glance I didn't see any documentation, so will skip for now and only come back if neccessary.</p>
+<p>Another nyx frontend is also accessible over LibAFL, we will talk later about LibAFL soon!</p>
+<h2>msFuzz</h2>
+<p>msFuzz builds on top of nyx/kAFL and therefore will work with Intel PT and QEMU. The host has to be Linux. Sadly the documentation about the internals is in some Asian language.
+Whats clear is that this fuzzer is designed for Drivers using IOCTL, a common communication point between user and kernel mode. This is something we surely want to fuzz.</p>
+<p>They seem to use angr, which is for symbolic execution. angr should be a rather inperformant choice here, but often fuzzers don't realy have any working or an next to impossible to build symex solution. So I see it as an feature to have.</p>
+<p>It seems actively maintained for now. This fuzzer will land on my nice to have list.</p>
+<h2>What the fuzz</h2>
+<p>wtf is realy something. Since the other incorporate lots of work from each other, wtf seems to be a fuzzer build from ground up. It runs on Windows and Linux, it supports three types of execution environments (bochscpu, Hyper-V, KVM). It has coverage-guidance and snapshot-fuzzing. It brings some tools for triaging.
+What is unclear for me is if it brings ASan or other memory sanitizers, or if it just will act upon a crash.</p>
+<p>The initial setup process is described as being some work. But this fuzzer seems like a realy good starting ground for user and kernelmode fuzzing of most of the things. It is actively maintained and the development process is documented as are some fuzzing cases.</p>
+<h2>LibALF</h2>
+<p>LibAFL is a huge deal realy. It is also a framework, coming from the developers of AFL++. Since years of experience and a huge community goes into this project it is the most feature-rich out there probably. LibAFL brings components to stick fuzzers together. Therefore we can do whitebox/blackbox, we can instrument with TinyInst, QEMU, frida, ...</p>
+<p>The downside in my eye is that they do alot and therefore often details are not clear. Documentation is minimal. I often build fuzzer from there examples and fail in the process, because something on another used component changed or the tooling is not described well, or, or ,or ...</p>
+<p>Therefore its a gamble if we have strikt time restrictions. But if we are able to wait some days, tickets are probably looked at and problems are resolved or at least some context is given.</p>
+<p>We have all we wish for, but we would have to stick fuzzers together our selfs.
+Lets go through some possible ways to use this.</p>
+<h3>LibAFL-Windows</h3>
+<p>Not an officialy name, LibAFL supports building fuzzer for windows in some way. Its not tested as much, but fuzzers can be build. So seeing a fuzzer in the examples named <a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/libfuzzer_windows_asan">libfuzzer_windows_asan</a> seems like something to build. Sadly it did not build, but I went to the fuzzing discord and other people helped me resolve the problems. Building some other fuzzer worked, some didn't. So this could be used at least for whitebox fuzzing with some work.</p>
+<h3>LibAFL-frida</h3>
+<p>Injecting frida into processes will allow us to fuzz a good amount of software with relatively no work. This will only work for usermode is my guess. Else frida might fail for hard to track reasons and my experience with other frida-fuzzer lead me to believe that its not very reliable. Especially I am unsure about the amount of development going into frida for windows. <a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/frida_gdiplus">Here</a> is an example fuzzer. The work is super new, so I expect bugs but lets see.
+Since AFL++ had memory sanitizer for frida, I think they made that happen again. This could be a useful tool for us if tests show it's working.</p>
+<h3>LibAFl-nyx</h3>
+<p>As talked about before, LibAFL can be a frontend for nyx. Therefore we can do snapshot-fuzzing with QEMU. <a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/nyx_libxml2_parallel">Here</a> is an example fuzzer.</p>
+<h3>LibAFL-Qemu</h3>
+<p>LibAFL wants to bring their own QEMU-mode. This will use QEMU in its Emulator mode, not like nyx as a virtual machine. This will allow for way better coverage, but at a cost of speed. The community makes quite the effort to make it happen. <a href="https://media.ccc.de/v/37c3-12102-fuzz_everything_everywhere_all_at_once/oembed">Here is a CCC-Talk about it</a></p>
+<p>So there is two modes for now, <a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/qemu_coverage">LibAFL-Qemu (Usermode)</a> and <a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/qemu_systemmode">LibAFL-Qemu (Systemmode)</a>. The Systemmode is still not released, but should come soon.</p>
+<h3>Conclusion</h3>
+<p>There is way less good variety as I expected but we will go on with looking into nyx/kafl, msFuzz, wtf, LibAFL. I think WinAFL, Winnie and Jackalope are all superseded by LibAFL easily.</p>
+<p>This means we have just one and a half option to run on windows (wtf, LibAFL) and three fuzzers will work with snapshot-fuzzing. With LibAFL, we have great tooling at our hand, but we don't get a great generic fuzzer gifted, we will have to build it together still.</p>
+            </div>
+            <div class="post_list">
+                <span>By </span>
+                <a href="https://blog.riskreduction.net/author/gbaru.html">@gbaru</a>
+                <span> in </span>
+                <span class="post_category"><a href="https://blog.riskreduction.net/category/windows.html" rel="bookmark"
+                                               title="Permalink to windows">[ windows ]</a></span>
+                <span class="post_date">Di 20 Februar 2024</span>
+                <div><span>Tags : </span>
+                            <span><a href="https://blog.riskreduction.net/tag/windows.html">#windows, </a></span>
+                            <span><a href="https://blog.riskreduction.net/tag/fuzzing.html">#fuzzing, </a></span>
+                </div>
+
+            </div>
+        </article>
+    </section>
+</article>
+
+<!-- Footer -->
+    <footer>
+        <p>
+        </p>
+    </footer>
+
+
+</body>
+</html>
