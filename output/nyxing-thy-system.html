@@ -100,7 +100,7 @@
 <h2>Ubuntu to Arch Kernel</h2>
 <p>Our way is to download any prebuild nyx-kernel. For example from msFuzz <a href="https://github.com/IntelLabs/kafl.linux/releases/download/kvm-nyx-v6.0/linux-image-6.0.0-nyx+_6.0.0-nyx+-1_amd64.deb">nyx-6.0.0</a> or from nyx-fuzz <a href="https://github.com/nyx-fuzz/KVM-Nyx/releases/tag/v5.10.73-1.2">nyx-5.10.73</a>.</p>
 <p>I will go with the nyx-fuzz one for now. I download the kernel and make a new dir ubuntu_kernel.</p>
-<p><img alt="picture 1" src="../images/5dde4bc256ce077a06bf5c773c35dbd4387ec22c21136dd51acf0a8443df6427.png">  </p>
+<p><img alt="picture 1" src="./images/5dde4bc256ce077a06bf5c773c35dbd4387ec22c21136dd51acf0a8443df6427.png">  </p>
 <p>Now we place the kernel and modules into our system. </p>
 <div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>ubuntu_kernel
 cp<span class="w"> </span>ubuntu-kernel-5.10.75.zip<span class="w"> </span>ubuntu-kernel-5.10.75.zip
@@ -124,7 +124,7 @@ sudo<span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>
 </code></pre></div>
 
 <p>Now edit to the new kernel</p>
-<p><img alt="picture 2" src="../images/23928f597eba2de67a78165254c54bde2b99c7eb8b920cbc36ac2576a2fd0e48.png">  </p>
+<p><img alt="picture 2" src="./images/23928f597eba2de67a78165254c54bde2b99c7eb8b920cbc36ac2576a2fd0e48.png">  </p>
 <p>and finish up with this</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>depmod<span class="w"> </span><span class="m">5</span>.10.75-051075-generic
 sudo<span class="w"> </span>mkinitcpio<span class="w"> </span>-p<span class="w"> </span>nyx<span class="w"> </span>--kernel<span class="w"> </span><span class="m">5</span>.10.75-051075-generic

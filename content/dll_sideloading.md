@@ -32,10 +32,11 @@ Get-ChildItem -Path "C:\Program Files\" -Filter *.exe -Recurse -File -Name | For
 
 Generally the output can be considered in two parts, the binary analysis shows which dlls might be attackable with an exlamation mark:
 
-![picture 1](../images/49369742dbe0ea41b57696a371613a5574117beee51a7cf96318b04763785fb5.png)  
+![picture 1](./images/49369742dbe0ea41b57696a371613a5574117beee51a7cf96318b04763785fb5.png)  
 
 In the next section it will analyse the probable attackable libraries and gives an exploitabilty suggestion:
-![picture 2](../images/38019f07c834ac302e5f4c84eba042d7d9a2836f8f507832967946b3a8177bda.png)  
+
+![picture 2](./images/38019f07c834ac302e5f4c84eba042d7d9a2836f8f507832967946b3a8177bda.png)  
 
 Here you can see, which dll's one would have to place and where.
 A nice next step would be to get which of the vulnerable marked locations are writeable to us.
@@ -91,7 +92,7 @@ Invoke-DllClone -Source C:\Windows\System32\version.dll -target C:\Users\you\sou
 Placing it in the same directory as 010 editor and running it will cause this:
 
   
-![picture 4](../images/751f81fedc6f887b1a11848c7b64673a878e2f0dcefdbbe7c000a117b6e71a12.png)  
+![picture 4](./images/751f81fedc6f887b1a11848c7b64673a878e2f0dcefdbbe7c000a117b6e71a12.png)  
 
 
 ## Downgrading

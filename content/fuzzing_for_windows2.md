@@ -27,7 +27,7 @@ I had to redo the setup for Windows 10. It also failed to run wtf, so I had to c
 
 From here I witnessed bochscpu being around 300-500 execs/s, while Hyper-V just reached 12 execs/s. That is a fine speed for an emulator, strangely a VM should reach higher speeds.
 The third option would be to run it in KVM, but therefore I would need a Linux System.
-![WTF using Bochscpu](../images/e514dddbd6c4287aa34c14a47c0972a214c423728e260b6a5bae5148b3bb64cb.png)  
+![WTF using Bochscpu](./images/e514dddbd6c4287aa34c14a47c0972a214c423728e260b6a5bae5148b3bb64cb.png)  
 
 ## Second round msFuzz
 

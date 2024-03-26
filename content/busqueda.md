@@ -8,11 +8,11 @@ Busqueda is a 2023 machine (don't know exactly) and is in the easy range.
 
 ## Init Recon
 
-![picture 1](../images/04ac0f19058874fcb4e8b581c67fc3cdf4752bbf679a5f8f55228d9d049105f4.png)  
+![picture 1](./images/04ac0f19058874fcb4e8b581c67fc3cdf4752bbf679a5f8f55228d9d049105f4.png)  
 
 It has two ports (22, 80) open. On port 80 is a webapp. We start with that.
 Sorry for my version of the web-page might look ugly. I used HTB Pwnbox, and they can't load the js because of no internet.
-![picture 2](../images/37178a6082db92266f1de3a13693b0b159e8efbfe5c8665657e1dbb91ed91ca5.png)  
+![picture 2](./images/37178a6082db92266f1de3a13693b0b159e8efbfe5c8665657e1dbb91ed91ca5.png)  
 
   
 
@@ -52,10 +52,10 @@ now we can just run with different injections
 '),print('hi')# -> works!!!
 ```
 
-![picture 3](../images/951d2ae424d35221ae7d9fa0a8a8852496a42404d0440ff4e0d07b37842e1399.png)  
+![picture 3](./images/951d2ae424d35221ae7d9fa0a8a8852496a42404d0440ff4e0d07b37842e1399.png)  
 
 Just to see how that can be, I verified that in python directly, seems function calls can be seperated with a colon:
-![picture 4](../images/7541f719e1803d0038a0fe81f93cdec7e4841b7bad72e8fc7b9f2245eb6be845.png)  
+![picture 4](./images/7541f719e1803d0038a0fe81f93cdec7e4841b7bad72e8fc7b9f2245eb6be845.png)  
 
 So the two main things I recognize that did not work with random rev shells from the web are double quotes and semicolon. For most functionality we want to have we will need to be able to import in python. Since we will work with one line of code, normaly imports would be seperated with semicolon still.
 
@@ -86,5 +86,5 @@ __import__('os').system('whoami')
 
 Testing shows it works:
  
-![picture 6](../../images/a7b4ddb8a7dbf053aaf97fbc062a997bd95a596f63db2fbf92e2c4b9304c69fd.png)  
+![picture 6](./images/a7b4ddb8a7dbf053aaf97fbc062a997bd95a596f63db2fbf92e2c4b9304c69fd.png)  
 

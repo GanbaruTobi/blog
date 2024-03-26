@@ -1,6 +1,6 @@
 Title: Fuzzing for Windows (1) - First Thoughts and Fuzzer Selection
 Date: 2024-02-20 13:00
-Category: windows
+Category: windows, fuzzing
 Tags: windows, fuzzing
 
 ## Whats the goal
