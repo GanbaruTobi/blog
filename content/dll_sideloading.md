@@ -30,22 +30,14 @@ Get-ChildItem -Path "C:\Program Files\" -Filter *.exe -Recurse -File -Name | For
 }
 ```
 
-<<<<<<< HEAD
 Generally the output can be considered in two parts, the binary analysis shows which dlls might be attackable with an exlamation mark:
-=======
-Generally the output can be considered in two parts, the binary analysis shows which DLLs might be attackable with an exlamation mark:
->>>>>>> ffb806d5d60bcee6825dda9c7472b68de6a260cc
 
 ![picture 1](../images/49369742dbe0ea41b57696a371613a5574117beee51a7cf96318b04763785fb5.png)  
 
 In the next section it will analyse the probable attackable libraries and gives an exploitabilty suggestion:
 ![picture 2](../images/38019f07c834ac302e5f4c84eba042d7d9a2836f8f507832967946b3a8177bda.png)  
 
-<<<<<<< HEAD
 Here you can see, which dll's one would have to place and where.
-=======
-Here you can see, which DLL's one would have to place and where.
->>>>>>> ffb806d5d60bcee6825dda9c7472b68de6a260cc
 A nice next step would be to get which of the vulnerable marked locations are writeable to us.
 
 ### Koppeling
@@ -54,11 +46,7 @@ When placing a DLL with our attack code, we quickly realize the need to provide 
 
 Koppeling is a tool that allows us to provide the original desired DLL and our attacker code separately. It facilitates the merging of these components, ensuring that all the required functions are available for the application.
 
-<<<<<<< HEAD
-I use [Invoke-DLLClone](https://github.com/jfmaes/Invoke-DLLClone), which uses Koppeling inside, since I had problems with the original code. Then we just need some dll code like this:
-=======
 I use [Invoke-DLLClone](https://github.com/jfmaes/Invoke-DLLClone), which uses Koppeling inside, since I had problems with the original code. Then we just need some DLL code like this:
->>>>>>> ffb806d5d60bcee6825dda9c7472b68de6a260cc
 
 ```c
 #include <windows.h>
@@ -102,12 +90,8 @@ Invoke-DllClone -Source C:\Windows\System32\version.dll -target C:\Users\you\sou
 
 Placing it in the same directory as 010 editor and running it will cause this:
 
-<<<<<<< HEAD
-![picture 3](../images/aed4d3a15b0f37c3c97b5f5b5ba5a23b950a4742a951ec51dae51ae7a9594800.png)  
-=======
   
 ![picture 4](../images/751f81fedc6f887b1a11848c7b64673a878e2f0dcefdbbe7c000a117b6e71a12.png)  
->>>>>>> ffb806d5d60bcee6825dda9c7472b68de6a260cc
 
 
 ## Downgrading

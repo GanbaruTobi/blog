@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>gbaru's blog</title><link href="https://blog.riskreduction.net/" rel="alternate"></link><link href="https://blog.riskreduction.net/feeds/all.atom.xml" rel="self"></link><id>https://blog.riskreduction.net/</id><updated>2024-02-20T13:00:00+01:00</updated><entry><title>Fuzzing for Windows (1) - First Thoughts and Fuzzer Selection</title><link href="https://blog.riskreduction.net/fuzzing-for-windows-1-first-thoughts-and-fuzzer-selection.html" rel="alternate"></link><published>2024-02-20T13:00:00+01:00</published><updated>2024-02-20T13:00:00+01:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2024-02-20:/fuzzing-for-windows-1-first-thoughts-and-fuzzer-selection.html</id><summary type="html">&lt;h2&gt;Whats the goal&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>gbaru's blog</title><link href="https://blog.riskreduction.net/" rel="alternate"></link><link href="https://blog.riskreduction.net/feeds/all.atom.xml" rel="self"></link><id>https://blog.riskreduction.net/</id><updated>2024-03-26T13:00:00+01:00</updated><entry><title>Nyxing thy System</title><link href="https://blog.riskreduction.net/nyxing-thy-system.html" rel="alternate"></link><published>2024-03-26T13:00:00+01:00</published><updated>2024-03-26T13:00:00+01:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2024-03-26:/nyxing-thy-system.html</id><summary type="html">&lt;p&gt;Since I am running my own arch OS, but still need capabilities for fuzzing with nyx, I see myself booting a Ubuntu System from an external drive. I wanted to fix this, so my friend manolis looked into getting the kernel to run on my Arch system.&lt;/p&gt;
+&lt;h2&gt;Ubuntu to Arch …&lt;/h2&gt;</summary><content type="html">&lt;p&gt;Since I am running my own arch OS, but still need capabilities for fuzzing with nyx, I see myself booting a Ubuntu System from an external drive. I wanted to fix this, so my friend manolis looked into getting the kernel to run on my Arch system.&lt;/p&gt;
+&lt;h2&gt;Ubuntu to Arch Kernel&lt;/h2&gt;
+&lt;p&gt;Our way is to download any prebuild nyx-kernel. For example from msFuzz &lt;a href="https://github.com/IntelLabs/kafl.linux/releases/download/kvm-nyx-v6.0/linux-image-6.0.0-nyx+_6.0.0-nyx+-1_amd64.deb"&gt;nyx-6.0.0&lt;/a&gt; or from nyx-fuzz &lt;a href="https://github.com/nyx-fuzz/KVM-Nyx/releases/tag/v5.10.73-1.2"&gt;nyx-5.10.73&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I will go with the nyx-fuzz one for now. I download the kernel and make a new dir ubuntu_kernel.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="picture 1" src="../images/5dde4bc256ce077a06bf5c773c35dbd4387ec22c21136dd51acf0a8443df6427.png"&gt;  &lt;/p&gt;
+&lt;p&gt;Now we place the kernel and modules into our system. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;ubuntu_kernel
+cp&lt;span class="w"&gt; &lt;/span&gt;ubuntu-kernel-5.10.75.zip&lt;span class="w"&gt; &lt;/span&gt;ubuntu-kernel-5.10.75.zip
+unzip&lt;span class="w"&gt; &lt;/span&gt;ubuntu-kernel-5.10.75.zip
+
+mkdir&lt;span class="w"&gt; &lt;/span&gt;kernel
+&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;kernel
+ar&lt;span class="w"&gt; &lt;/span&gt;x&lt;span class="w"&gt; &lt;/span&gt;../linux-image-unsigned-5.10.75-051075-generic_5.10.75-051075.202110201038_amd64.deb
+tar&lt;span class="w"&gt; &lt;/span&gt;-xvf&lt;span class="w"&gt; &lt;/span&gt;data.tar.xz
+sudo&lt;span class="w"&gt; &lt;/span&gt;cp&lt;span class="w"&gt; &lt;/span&gt;boot/vmlinuz-5.10.75-051075-generic&lt;span class="w"&gt; &lt;/span&gt;/boot/
+&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;..
+
+mkdir&lt;span class="w"&gt; &lt;/span&gt;modules
+&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;modules
+ar&lt;span class="w"&gt; &lt;/span&gt;x&lt;span class="w"&gt; &lt;/span&gt;../linux-modules-5.10.75-051075-generic_5.10.75-051075.202110201038_amd64.deb
+sudo&lt;span class="w"&gt; &lt;/span&gt;cp&lt;span class="w"&gt; &lt;/span&gt;-r&lt;span class="w"&gt; &lt;/span&gt;./lib/modules/5.10.75-051075-generic&lt;span class="w"&gt; &lt;/span&gt;/usr/lib/modules/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;After that we have the files in place but we have to create an initramfs. We can do so with mkinitfcpio, lets make a new preset for nyx.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;cp&lt;span class="w"&gt; &lt;/span&gt;/etc/mkinitcpio.d/linux.preset&lt;span class="w"&gt; &lt;/span&gt;/etc/mkinitcpio.d/nyx.preset
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now edit to the new kernel&lt;/p&gt;
+&lt;p&gt;&lt;img alt="picture 2" src="../images/23928f597eba2de67a78165254c54bde2b99c7eb8b920cbc36ac2576a2fd0e48.png"&gt;  &lt;/p&gt;
+&lt;p&gt;and finish up with this&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;depmod&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;.10.75-051075-generic
+sudo&lt;span class="w"&gt; &lt;/span&gt;mkinitcpio&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;nyx&lt;span class="w"&gt; &lt;/span&gt;--kernel&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;.10.75-051075-generic
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now everything went without major errors for me.
+There might be some modules missing, but in general this works for me and makes it possible to run the nyx-fuzzers.&lt;/p&gt;</content><category term="Fuzzing"></category><category term="fuzzing"></category></entry><entry><title>Fuzzing for Windows (1) - First Thoughts and Fuzzer Selection</title><link href="https://blog.riskreduction.net/fuzzing-for-windows-1-first-thoughts-and-fuzzer-selection.html" rel="alternate"></link><published>2024-02-20T13:00:00+01:00</published><updated>2024-02-20T13:00:00+01:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2024-02-20:/fuzzing-for-windows-1-first-thoughts-and-fuzzer-selection.html</id><summary type="html">&lt;h2&gt;Whats the goal&lt;/h2&gt;
 &lt;p&gt;We want to find the best multi-purpose fuzzers which are state-of-the-art. They are supposed to run inside of Windows or work with Windows VMs as targets.&lt;/p&gt;
 &lt;h2&gt;Initial Selection&lt;/h2&gt;
 &lt;p&gt;The fuzzers I found which are worth having a look at are:&lt;/p&gt;
@@ -223,70 +259,16 @@ It is &lt;a href="https://github.com/Cybereason/siofra"&gt;siofra&lt;/a&gt;.&lt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
-Generally the output can be considered in two parts, the binary analysis shows which dlls might be attackable with an exlamation mark:
-=======
-Generally the output can be considered in two parts, the binary analysis shows which DLLs might be attackable with an exlamation mark:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;Generally the output can be considered in two parts, the binary analysis shows which dlls might be attackable with an exlamation mark:&lt;/p&gt;
 &lt;p&gt;&lt;img alt="picture 1" src="../images/49369742dbe0ea41b57696a371613a5574117beee51a7cf96318b04763785fb5.png"&gt;  &lt;/p&gt;
 &lt;p&gt;In the next section it will analyse the probable attackable libraries and gives an exploitabilty suggestion:
 &lt;img alt="picture 2" src="../images/38019f07c834ac302e5f4c84eba042d7d9a2836f8f507832967946b3a8177bda.png"&gt;  &lt;/p&gt;
-&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
-Here you can see, which dll's one would have to place and where.
-=======
-Here you can see, which DLL's one would have to place and where.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc
+&lt;p&gt;Here you can see, which dll's one would have to place and where.
 A nice next step would be to get which of the vulnerable marked locations are writeable to us.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
 &lt;h3&gt;Koppeling&lt;/h3&gt;
 &lt;p&gt;When placing a DLL with our attack code, we quickly realize the need to provide all the functions that the main binary wants to import from the library. This challenge is addressed by using &lt;a href="https://github.com/monoxgas/Koppeling"&gt;koppeling&lt;/a&gt;. &lt;/p&gt;
 &lt;p&gt;Koppeling is a tool that allows us to provide the original desired DLL and our attacker code separately. It facilitates the merging of these components, ensuring that all the required functions are available for the application.&lt;/p&gt;
-&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
-I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&lt;/a&gt;, which uses Koppeling inside, since I had problems with the original code. Then we just need some dll code like this:
-=======
-I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&lt;/a&gt;, which uses Koppeling inside, since I had problems with the original code. Then we just need some DLL code like this:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&lt;/a&gt;, which uses Koppeling inside, since I had problems with the original code. Then we just need some DLL code like this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;windows.h&amp;gt;&lt;/span&gt;
 &lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;quot;pch.h&amp;quot;&lt;/span&gt;
 
@@ -323,25 +305,7 @@ I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Placing it in the same directory as 010 editor and running it will cause this:&lt;/p&gt;
-&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
-&lt;img alt="picture 3" src="../images/aed4d3a15b0f37c3c97b5f5b5ba5a23b950a4742a951ec51dae51ae7a9594800.png"&gt;&lt;br&gt;
-=======&lt;/p&gt;
 &lt;p&gt;&lt;img alt="picture 4" src="../images/751f81fedc6f887b1a11848c7b64673a878e2f0dcefdbbe7c000a117b6e71a12.png"&gt;  &lt;/p&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
 &lt;h2&gt;Downgrading&lt;/h2&gt;
 &lt;p&gt;Most of the time, I consider myself to be in a lower privileged position and contemplate injecting my code somewhere. However, there is another attack against DLL sideloading known as downgrading. This attack may be challenging or ineffective in low-privilege situations, but it becomes particularly interesting in higher privilege scenarios.&lt;/p&gt;
 &lt;p&gt;With downgrading, we can replace a DLL with a known vulnerable version. If the other imported functions remain intact, the loading process will succeed (although there may be cases where the output of the functions has changed, resulting in runtime issues, but this is not very common).&lt;/p&gt;

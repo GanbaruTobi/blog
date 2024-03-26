@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Person">
+<head>
+            <meta charset="utf-8">
+        <!-- Site Meta Data -->
+        <title>Fuzzing for Windows (6) - Working with libAFL</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="gbaru">
+
+        <link rel="shortcut icon" href="">
+
+        <!-- schema.org -->
+        <meta itemprop="name" content="gbaru's blog">
+        <meta itemprop="image" content="/theme/images/icons/avatar.png">
+        <meta itemprop="description" content="">
+
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+        <!-- Style Meta Data -->
+        <link rel="stylesheet" href="https://blog.riskreduction.net/theme/css/style.css" type="text/css"/>
+        <link rel="stylesheet" href="https://blog.riskreduction.net/theme/css/pygments.css" type="text/css"/>
+
+        <!-- Feed Meta Data -->
+            <link href="https://blog.riskreduction.net/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+                  title="gbaru's blog ATOM Feed"/>
+
+        <!-- Twitter Feed -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="">
+        <meta name="twitter:image" content="">
+
+    <meta name="twitter:creator" content="">
+    <meta name="twitter:url" content="https://blog.riskreduction.net/drafts/fuzzing-for-windows-6-working-with-libafl.html">
+    <meta name="twitter:title" content="gbaru's blog ~ Fuzzing for Windows (6) - Working with libAFL">
+    <meta name="twitter:description" content="Whats the goal Understanding the parts a fuzzer is build of in libAFL. Especially for qemu systemmode and frida, since these enable us to fuzz blackbox binaries. Nyx also is possible here, but I will leave out for now, because we will need a modified host to use it. What …">
+
+    <!-- Facebook Meta Data -->
+    <meta property="og:title" content="gbaru's blog ~ Fuzzing for Windows (6) - Working with libAFL"/>
+    <meta property="og:description" content="Whats the goal Understanding the parts a fuzzer is build of in libAFL. Especially for qemu systemmode and frida, since these enable us to fuzz blackbox binaries. Nyx also is possible here, but I will leave out for now, because we will need a modified host to use it. What …"/>
+    <meta property="og:image" content=""/>
+</head>
+
+<body>
+<!-- Sidebar -->
+<aside>
+    <center><a href="/theme/images/icons/avatar.png"><img id="avatar" src="/theme/images/icons/avatar.png"></a></center>
+    <h1>gbaru's blog</h1>
+        <p>Binary Exploitation and Red Teaming</p>
+    <br>
+
+
+    <nav class="nav">
+        <ul class="list-bare">
+
+                <li><a class="nav__link" href="/">Articles</a></li>
+                <li><a class="nav__link" href="/tags/">Tags</a></li>
+
+
+        </ul>
+    </nav>
+
+    <p class="social">
+                <a href="mailto:blog.gbarut@riskreduction.net" target="_blank"><img
+                        src="https://blog.riskreduction.net/theme/images/icons/mail-128.png"></a>
+                <a href="http://twitter.com/GanbaruTobi" target="_blank"><img
+                        src="https://blog.riskreduction.net/theme/images/icons/twitter.png"></a>
+                <a href="http://github.com/GanbaruTobi" target="_blank"><img
+                        src="https://blog.riskreduction.net/theme/images/icons/github.png"></a>
+            <a href="https://blog.riskreduction.net/feeds/all.atom.xml" rel="alternate">
+                <img src="https://blog.riskreduction.net/theme/images/icons/rss.png"></a>
+    </p>
+
+        <h2>Categories</h2>
+        <ul class="navbar">
+                <li><a
+                        href="https://blog.riskreduction.net/category/fuzzing.html">Fuzzing</a></li>
+                <li><a
+                        href="https://blog.riskreduction.net/category/general.html">General</a></li>
+                <li><a
+                        href="https://blog.riskreduction.net/category/misc.html">Misc</a></li>
+                <li><a
+                        href="https://blog.riskreduction.net/category/pentest.html">Pentest</a></li>
+                <li><a
+                        href="https://blog.riskreduction.net/category/red.html">Red</a></li>
+                <li class="active"><a
+                        href="https://blog.riskreduction.net/category/windows.html">windows</a></li>
+        </ul>
+
+
+</aside>
+
+<!-- Content -->
+<article>
+    <section id="content">
+        <article>
+            <h2 class="post_title post_detail"><a href="https://blog.riskreduction.net/drafts/fuzzing-for-windows-6-working-with-libafl.html" rel="bookmark"
+                                                  title="Permalink to Fuzzing for Windows (6) - Working with libAFL">Fuzzing for Windows (6) - Working with libAFL</a></h2>
+            <div class="entry-content blog-post">
+                <h2>Whats the goal</h2>
+<p>Understanding the parts a fuzzer is build of in libAFL. Especially for qemu systemmode and frida, since these enable us to fuzz blackbox binaries. Nyx also is possible here, but I will leave out for now, because we will need a modified host to use it.</p>
+<h2>What parts of LibAFL can we use on Windows</h2>
+<p>Right now the meaningfull options are to compile a target with instrumentation or use frida, nyx, or qemu. Here are example fuzzers that use these techniques.</p>
+<ul>
+<li><a href="https://github.com/AFLplusplus/LibAFL">LibAFL</a><ul>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/libfuzzer_windows_asan">LibAFL-Windows</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/frida_gdiplus">LibAFL-frida</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/nyx_libxml2_parallel">LibAFL-nyx</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/qemu_systemmode">LibAFL-Qemu (Systemmode)</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/fuzzers/qemu_coverage">LibAFL-Qemu (Usermode)</a></li>
+</ul>
+</li>
+</ul>
+<h2>Generating Docs</h2>
+<div class="highlight"><pre><span></span><code>cargo<span class="w"> </span>docs<span class="w"> </span>--open<span class="w"> </span>
+</code></pre></div>
+
+<p>With this command we can generate the docs of the project. Also of the modules that we want to use, we can cd into the modules and build docs from there only too
+The modules we use are reachable here:</p>
+<ul>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/libafl_frida">LibAFL-frida</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/libafl_nyx">LibAFL-nyx</a></li>
+<li><a href="https://github.com/AFLplusplus/LibAFL/tree/main/libafl_qemu">LibAFL-Qemu</a></li>
+</ul>
+<h2>Further Resources</h2>
+<p>There is <a href="https://epi052.gitlab.io/notes-to-self/blog/">this</a> series about building some fuzzers. The WIP Book about libAFL is <a href="https://aflplus.plus/libafl-book">here</a>.</p>
+<p>Than there is a <a href="https://www.atredis.com/blog/2023/12/4/a-libafl-introductory-workshop">workshop</a> available.</p>
+<h2>General Components</h2>
+<h3>Observation Channel - Observer</h3>
+<p>The Observer is the component in which we track what happens in the target. In AFL this would be the coverage map for example.
+Another Observer could be to track execution time, or we could introduce custome code points in a binary and track those.</p>
+<h3>Target Execution - Executor</h3>
+<p>The Executor is the component dealing with how to run the target. This can be a binary or a VM or other stuff.</p>
+<p>For example there is an in-memory Executor. This is known as the LLVMFuzzOneInput() Function in harnesses. This function is exported and can be called by a fuzzer. Therefore the fuzzing loop is inside an application.</p>
+<p>Another Executor would be a forkserver. The process is forked (copied) and executed with new fuzzer input each time.</p>
+<p>The Executor also connects the Observer with the target.</p>
+<h3>Understanding the Target - Feedback</h3>
+<p>The Feedback Modul is to filter the Observator for interesting results.</p>
+<p>For example finding observations with new coverage. Or look for bigger memory allocations. </p>
+<p>Also there is Objectives</p>
+<h4>Objective Feedback</h4>
+<p>This are goals we give our fuzzing campaign, like finding crashes.</p>
+<p>Another goal would be to reach a certain point in the program, think of login-bypasses.</p>
+<h3>Input</h3>
+<p>Of course we have to use something to feed to the program.
+It does not have to be an expected format, but it has to be a structure that can be manipulated.</p>
+<h3>Corpus</h3>
+<p>Storage of the interesting Inputs and Metadata we found with Feedback. This will be used by the fuzzer if neccessary.
+It also measures how they relate to each other (think duplicates and stuff).</p>
+<p>This can be implemented as a queue for example (AFL)</p>
+<h3>RNG - Random Number</h3>
+<p>Important what to use for random stuff, since the performance depends on it.</p>
+<h3>State</h3>
+<p>All the evolving parts when fuzzing.
+Like corpus and feedback.</p>
+<h3>Events and Event Manager</h3>
+<p>Events can be a new coverage, or a crash , or something important...</p>
+<p>An naive Event Manager just logs this to output.</p>
+<h3>libAFL-frida</h3>
+<p>For now this module only supports x86_x64, so we cannot fuzz x86 targets. Also officialy it only is able to fuzz libraries.</p>
+<p>Maybe we are able to foul the fuzzer to accept an exe that has been converted into an dll.
+Like it is done <a href="https://github.com/hasherezade/dll_to_exe">here</a>.</p>
+<h3>libAFL-qemu</h3>
+<p>To understand the qemu module its hard to just go by the docs, bc they are kind of empty.</p>
+<p>But there is <a href="https://s3.eurecom.fr/docs/bar24_malmain.pdf">this</a> paper describing the design.</p>
+<p>Also there is a windows fuzzer released with the paper in this <a href="https://github.com/AFLplusplus/libafl_qemu_artifacts">repo</a>. But its currently not building.</p>
+            </div>
+            <div class="post_list">
+                <span>By </span>
+                <a href="https://blog.riskreduction.net/author/gbaru.html">@gbaru</a>
+                <span> in </span>
+                <span class="post_category"><a href="https://blog.riskreduction.net/category/windows.html" rel="bookmark"
+                                               title="Permalink to windows">[ windows ]</a></span>
+                <span class="post_date">Di 19 März 2024</span>
+                <div><span>Tags : </span>
+                            <span><a href="https://blog.riskreduction.net/tag/windows.html">#windows, </a></span>
+                            <span><a href="https://blog.riskreduction.net/tag/fuzzing.html">#fuzzing, </a></span>
+                </div>
+
+            </div>
+        </article>
+    </section>
+</article>
+
+<!-- Footer -->
+    <footer>
+        <p>
+        </p>
+    </footer>
+
+
+</body>
+</html>

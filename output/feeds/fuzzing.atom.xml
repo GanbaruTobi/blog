@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>gbaru's blog - Fuzzing</title><link href="https://blog.riskreduction.net/" rel="alternate"></link><link href="https://blog.riskreduction.net/feeds/fuzzing.atom.xml" rel="self"></link><id>https://blog.riskreduction.net/</id><updated>2024-03-26T13:00:00+01:00</updated><entry><title>Nyxing thy System</title><link href="https://blog.riskreduction.net/nyxing-thy-system.html" rel="alternate"></link><published>2024-03-26T13:00:00+01:00</published><updated>2024-03-26T13:00:00+01:00</updated><author><name>gbaru</name></author><id>tag:blog.riskreduction.net,2024-03-26:/nyxing-thy-system.html</id><summary type="html">&lt;p&gt;Since I am running my own arch OS, but still need capabilities for fuzzing with nyx, I see myself booting a Ubuntu System from an external drive. I wanted to fix this, so my friend manolis looked into getting the kernel to run on my Arch system.&lt;/p&gt;
+&lt;h2&gt;Ubuntu to Arch …&lt;/h2&gt;</summary><content type="html">&lt;p&gt;Since I am running my own arch OS, but still need capabilities for fuzzing with nyx, I see myself booting a Ubuntu System from an external drive. I wanted to fix this, so my friend manolis looked into getting the kernel to run on my Arch system.&lt;/p&gt;
+&lt;h2&gt;Ubuntu to Arch Kernel&lt;/h2&gt;
+&lt;p&gt;Our way is to download any prebuild nyx-kernel. For example from msFuzz &lt;a href="https://github.com/IntelLabs/kafl.linux/releases/download/kvm-nyx-v6.0/linux-image-6.0.0-nyx+_6.0.0-nyx+-1_amd64.deb"&gt;nyx-6.0.0&lt;/a&gt; or from nyx-fuzz &lt;a href="https://github.com/nyx-fuzz/KVM-Nyx/releases/tag/v5.10.73-1.2"&gt;nyx-5.10.73&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I will go with the nyx-fuzz one for now. I download the kernel and make a new dir ubuntu_kernel.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="picture 1" src="../images/5dde4bc256ce077a06bf5c773c35dbd4387ec22c21136dd51acf0a8443df6427.png"&gt;  &lt;/p&gt;
+&lt;p&gt;Now we place the kernel and modules into our system. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;ubuntu_kernel
+cp&lt;span class="w"&gt; &lt;/span&gt;ubuntu-kernel-5.10.75.zip&lt;span class="w"&gt; &lt;/span&gt;ubuntu-kernel-5.10.75.zip
+unzip&lt;span class="w"&gt; &lt;/span&gt;ubuntu-kernel-5.10.75.zip
+
+mkdir&lt;span class="w"&gt; &lt;/span&gt;kernel
+&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;kernel
+ar&lt;span class="w"&gt; &lt;/span&gt;x&lt;span class="w"&gt; &lt;/span&gt;../linux-image-unsigned-5.10.75-051075-generic_5.10.75-051075.202110201038_amd64.deb
+tar&lt;span class="w"&gt; &lt;/span&gt;-xvf&lt;span class="w"&gt; &lt;/span&gt;data.tar.xz
+sudo&lt;span class="w"&gt; &lt;/span&gt;cp&lt;span class="w"&gt; &lt;/span&gt;boot/vmlinuz-5.10.75-051075-generic&lt;span class="w"&gt; &lt;/span&gt;/boot/
+&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;..
+
+mkdir&lt;span class="w"&gt; &lt;/span&gt;modules
+&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;modules
+ar&lt;span class="w"&gt; &lt;/span&gt;x&lt;span class="w"&gt; &lt;/span&gt;../linux-modules-5.10.75-051075-generic_5.10.75-051075.202110201038_amd64.deb
+sudo&lt;span class="w"&gt; &lt;/span&gt;cp&lt;span class="w"&gt; &lt;/span&gt;-r&lt;span class="w"&gt; &lt;/span&gt;./lib/modules/5.10.75-051075-generic&lt;span class="w"&gt; &lt;/span&gt;/usr/lib/modules/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;After that we have the files in place but we have to create an initramfs. We can do so with mkinitfcpio, lets make a new preset for nyx.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;cp&lt;span class="w"&gt; &lt;/span&gt;/etc/mkinitcpio.d/linux.preset&lt;span class="w"&gt; &lt;/span&gt;/etc/mkinitcpio.d/nyx.preset
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now edit to the new kernel&lt;/p&gt;
+&lt;p&gt;&lt;img alt="picture 2" src="../images/23928f597eba2de67a78165254c54bde2b99c7eb8b920cbc36ac2576a2fd0e48.png"&gt;  &lt;/p&gt;
+&lt;p&gt;and finish up with this&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;depmod&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;.10.75-051075-generic
+sudo&lt;span class="w"&gt; &lt;/span&gt;mkinitcpio&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;nyx&lt;span class="w"&gt; &lt;/span&gt;--kernel&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;.10.75-051075-generic
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Now everything went without major errors for me.
+There might be some modules missing, but in general this works for me and makes it possible to run the nyx-fuzzers.&lt;/p&gt;</content><category term="Fuzzing"></category><category term="fuzzing"></category></entry></feed>

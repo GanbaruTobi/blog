@@ -3,7 +3,7 @@
 <head>
             <meta charset="utf-8">
         <!-- Site Meta Data -->
-        <title>Arbitrary File Read/Write to RCE</title>
+        <title>WDM Driver Identification -</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
         <meta name="author" content="gbaru">
@@ -30,13 +30,13 @@
         <meta name="twitter:image" content="">
 
     <meta name="twitter:creator" content="">
-    <meta name="twitter:url" content="https://blog.riskreduction.net/drafts/arbitrary-file-readwrite-to-rce.html">
-    <meta name="twitter:title" content="gbaru's blog ~ Arbitrary File Read/Write to RCE">
-    <meta name="twitter:description" content="During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing, as it didn&#39;t use any unsafe keywords. Initially, we expected the flag to be located next to the application, and with knowledge of a path-traversal and file read/write primitive …">
+    <meta name="twitter:url" content="https://blog.riskreduction.net/drafts/wdm-driver-identification-.html">
+    <meta name="twitter:title" content="gbaru's blog ~ WDM Driver Identification -">
+    <meta name="twitter:description" content="Background Story Since I am looking into having a setup for fuzzing for windows components. One of my first target is windows drivers. While I can identify these componentes with my previously pe-extraction code in memflow, yes drivers are PE files, I now need a way to analyse them automatically …">
 
     <!-- Facebook Meta Data -->
-    <meta property="og:title" content="gbaru's blog ~ Arbitrary File Read/Write to RCE"/>
-    <meta property="og:description" content="During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing, as it didn&#39;t use any unsafe keywords. Initially, we expected the flag to be located next to the application, and with knowledge of a path-traversal and file read/write primitive …"/>
+    <meta property="og:title" content="gbaru's blog ~ WDM Driver Identification -"/>
+    <meta property="og:description" content="Background Story Since I am looking into having a setup for fuzzing for windows components. One of my first target is windows drivers. While I can identify these componentes with my previously pe-extraction code in memflow, yes drivers are PE files, I now need a way to analyse them automatically …"/>
     <meta property="og:image" content=""/>
 </head>
 
@@ -82,7 +82,7 @@
                         href="https://blog.riskreduction.net/category/pentest.html">Pentest</a></li>
                 <li><a
                         href="https://blog.riskreduction.net/category/red.html">Red</a></li>
-                <li><a
+                <li class="active"><a
                         href="https://blog.riskreduction.net/category/windows.html">windows</a></li>
         </ul>
 
@@ -93,27 +93,40 @@
 <article>
     <section id="content">
         <article>
-            <h2 class="post_title post_detail"><a href="https://blog.riskreduction.net/drafts/arbitrary-file-readwrite-to-rce.html" rel="bookmark"
-                                                  title="Permalink to Arbitrary File Read/Write to RCE">Arbitrary File Read/Write to RCE</a></h2>
+            <h2 class="post_title post_detail"><a href="https://blog.riskreduction.net/drafts/wdm-driver-identification-.html" rel="bookmark"
+                                                  title="Permalink to WDM Driver Identification -">WDM Driver Identification -</a></h2>
             <div class="entry-content blog-post">
-                <p>During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing, as it didn't use any unsafe keywords. Initially, we expected the flag to be located next to the application, and with knowledge of a path-traversal and file read/write primitive, we believed it would be a simple task to read the flag.</p>
-<p>However, after the CTF had ended, I spoke with the creator of the challenge, and he provided me with an exploit that utilized /proc/self/mem to create Remote Code Execution (RCE).</p>
-<p>The lessons are quite interesting, so I will go trough the application and the exploit and what we can learn about to exploit hopefully any given application on Linux where we have an arbitrary file read/write.</p>
-<p>First, let me provide u with the challenge, so u can look for urself:</p>
+                <h2>Background Story</h2>
+<p>Since I am looking into having a setup for fuzzing for windows components. One of my first target is windows drivers. While I can identify these componentes with my previously pe-extraction code in memflow, yes drivers are PE files, I now need a way to analyse them automatically.</p>
+<h2>Initial thoughts</h2>
+<p>I guess a good starting spot is to look for drivers using a buffer from usermode. These can be made with IRP <a href="https://learn.microsoft.com/de-de/windows-hardware/drivers/ddi/wdm/ns-wdm-_irp">IRP</a> which are part of <a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/types-of-wdm-drivers">WDM-Drivers</a>.</p>
+<p>So we need to:</p>
+<p>1) Identify drivers which are WDM-Drivers
+2) Find the IRP Requests
+3) Identify the IRP-Request for accepting usermode buffers</p>
+<h3>Identifying drivers</h3>
+<p>When looking at a driver in ghidra, there is a set of imports from the ntoskrnl.exe</p>
+<p>Here we can identify if a driver uses functions from the wdm.h. Common functions are named IoCreate... IoDelete...</p>
+<p>For example when looking at the HEVD Driver, we can see this imports:
+<img alt="Symbol tree HEVD" src="images\ghidra_symbols.png"></p>
+<p>We could make a list from WDM.h to look for all applicable functions, but I have a shortcut in mind. </p>
+<p>We need to be able to interact with the driver in the end. Therefore it needs to register a device in the system.
+For now I am sure that IoCreateDevice and IoCreateSymbolicLink are enough to identify the usage of WDM in a meaningful way.</p>
+<h3>Finding the IRP-Requests</h3>
+<p>So lets start thinking about it. Lots of drivers will have a DispatchRoutine, which will list all the functions something could call the driver with. But DispatchRoutines are not needed. They are optional.</p>
             </div>
             <div class="post_list">
                 <span>By </span>
                 <a href="https://blog.riskreduction.net/author/gbaru.html">@gbaru</a>
                 <span> in </span>
-                <span class="post_category"><a href="https://blog.riskreduction.net/category/linux.html" rel="bookmark"
-                                               title="Permalink to Linux">[ Linux ]</a></span>
-                <span class="post_date">So 07 Mai 2023</span>
+                <span class="post_category"><a href="https://blog.riskreduction.net/category/windows.html" rel="bookmark"
+                                               title="Permalink to windows">[ windows ]</a></span>
+                <span class="post_date">Mo 11 März 2024</span>
                 <div><span>Tags : </span>
-                            <span><a href="https://blog.riskreduction.net/tag/ctf.html">#ctf, </a></span>
-                            <span><a href="https://blog.riskreduction.net/tag/umdctf2023.html">#umdctf2023, </a></span>
-                            <span><a href="https://blog.riskreduction.net/tag/proc_self_mem.html">#proc_self_mem, </a></span>
-                            <span><a href="https://blog.riskreduction.net/tag/arbitrary_file_read_write.html">#arbitrary_file_read_write, </a></span>
-                            <span><a href="https://blog.riskreduction.net/tag/rust.html">#rust, </a></span>
+                            <span><a href="https://blog.riskreduction.net/tag/windows.html">#windows, </a></span>
+                            <span><a href="https://blog.riskreduction.net/tag/reversing.html">#reversing, </a></span>
+                            <span><a href="https://blog.riskreduction.net/tag/driver.html">#driver, </a></span>
+                            <span><a href="https://blog.riskreduction.net/tag/fuzzing.html">#fuzzing, </a></span>
                 </div>
 
             </div>

@@ -3,7 +3,7 @@
 <head>
             <meta charset="utf-8">
         <!-- Site Meta Data -->
-        <title>Arbitrary File Read/Write to RCE</title>
+        <title>Extraction of Portable Executeables (PE) from memory.</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
         <meta name="author" content="gbaru">
@@ -30,13 +30,13 @@
         <meta name="twitter:image" content="">
 
     <meta name="twitter:creator" content="">
-    <meta name="twitter:url" content="https://blog.riskreduction.net/drafts/arbitrary-file-readwrite-to-rce.html">
-    <meta name="twitter:title" content="gbaru's blog ~ Arbitrary File Read/Write to RCE">
-    <meta name="twitter:description" content="During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing, as it didn&#39;t use any unsafe keywords. Initially, we expected the flag to be located next to the application, and with knowledge of a path-traversal and file read/write primitive …">
+    <meta name="twitter:url" content="https://blog.riskreduction.net/drafts/extraction-of-portable-executeables-pe-from-memory.html">
+    <meta name="twitter:title" content="gbaru's blog ~ Extraction of Portable Executeables (PE) from memory.">
+    <meta name="twitter:description" content="Background Story While developing my tools for Windows Fuzzing I wante to test out memflow for memory introspection of a running or saved VM (coredump). This could be super handy with snapshot-fuzzing, because maybe we can do all besides fuzzing with memflow, or at least I hoped it could work …">
 
     <!-- Facebook Meta Data -->
-    <meta property="og:title" content="gbaru's blog ~ Arbitrary File Read/Write to RCE"/>
-    <meta property="og:description" content="During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing, as it didn&#39;t use any unsafe keywords. Initially, we expected the flag to be located next to the application, and with knowledge of a path-traversal and file read/write primitive …"/>
+    <meta property="og:title" content="gbaru's blog ~ Extraction of Portable Executeables (PE) from memory."/>
+    <meta property="og:description" content="Background Story While developing my tools for Windows Fuzzing I wante to test out memflow for memory introspection of a running or saved VM (coredump). This could be super handy with snapshot-fuzzing, because maybe we can do all besides fuzzing with memflow, or at least I hoped it could work …"/>
     <meta property="og:image" content=""/>
 </head>
 
@@ -82,7 +82,7 @@
                         href="https://blog.riskreduction.net/category/pentest.html">Pentest</a></li>
                 <li><a
                         href="https://blog.riskreduction.net/category/red.html">Red</a></li>
-                <li><a
+                <li class="active"><a
                         href="https://blog.riskreduction.net/category/windows.html">windows</a></li>
         </ul>
 
@@ -93,27 +93,29 @@
 <article>
     <section id="content">
         <article>
-            <h2 class="post_title post_detail"><a href="https://blog.riskreduction.net/drafts/arbitrary-file-readwrite-to-rce.html" rel="bookmark"
-                                                  title="Permalink to Arbitrary File Read/Write to RCE">Arbitrary File Read/Write to RCE</a></h2>
+            <h2 class="post_title post_detail"><a href="https://blog.riskreduction.net/drafts/extraction-of-portable-executeables-pe-from-memory.html" rel="bookmark"
+                                                  title="Permalink to Extraction of Portable Executeables (PE) from memory.">Extraction of Portable Executeables (PE) from memory.</a></h2>
             <div class="entry-content blog-post">
-                <p>During UMDCTF 2023, I encountered an intriguing pwn-challenge authored by Triacontakai. The application was written in Rust and seemed perplexing, as it didn't use any unsafe keywords. Initially, we expected the flag to be located next to the application, and with knowledge of a path-traversal and file read/write primitive, we believed it would be a simple task to read the flag.</p>
-<p>However, after the CTF had ended, I spoke with the creator of the challenge, and he provided me with an exploit that utilized /proc/self/mem to create Remote Code Execution (RCE).</p>
-<p>The lessons are quite interesting, so I will go trough the application and the exploit and what we can learn about to exploit hopefully any given application on Linux where we have an arbitrary file read/write.</p>
-<p>First, let me provide u with the challenge, so u can look for urself:</p>
+                <h2>Background Story</h2>
+<p>While developing my tools for Windows Fuzzing I wante to test out <a href="https://github.com/memflow/memflow">memflow</a> for memory introspection of a running or saved VM (coredump). This could be super handy with snapshot-fuzzing, because maybe we can do all besides fuzzing with memflow, or at least I hoped it could work like that.</p>
+<p>Soon I had to realize that I can access running programs but I lack to access the underlaying PE from memory, because the running PE is "malformed" compared to a disk file.
+There are two main reasons. The sections being mapped into memory is moving them to other locations. And the memory alignmend is on a page boundary(4096 mostly on Windows), while disk alingmend follows other rules.</p>
+<h2>What to do</h2>
+<p>Memflow is written in rust or is accessible over memflow-py in python.</p>
+<p>For rust exists two crates <a href="https://github.com/CasualX/pelite">pelite</a> and <a href="https://github.com/m4b/goblin">goblin</a>, which can parse the PE file format even from memory. So we would just have to fix the two problems we have.</p>
+<p>Luckily there are other tools which already are able to work with PE memdumps, like (pe-bear)(https://github.com/hasherezade/pe-bear). So if we get stuck we can look at their source code.</p>
+<h2></h2>
             </div>
             <div class="post_list">
                 <span>By </span>
                 <a href="https://blog.riskreduction.net/author/gbaru.html">@gbaru</a>
                 <span> in </span>
-                <span class="post_category"><a href="https://blog.riskreduction.net/category/linux.html" rel="bookmark"
-                                               title="Permalink to Linux">[ Linux ]</a></span>
-                <span class="post_date">So 07 Mai 2023</span>
+                <span class="post_category"><a href="https://blog.riskreduction.net/category/windows.html" rel="bookmark"
+                                               title="Permalink to windows">[ windows ]</a></span>
+                <span class="post_date">Fr 08 März 2024</span>
                 <div><span>Tags : </span>
-                            <span><a href="https://blog.riskreduction.net/tag/ctf.html">#ctf, </a></span>
-                            <span><a href="https://blog.riskreduction.net/tag/umdctf2023.html">#umdctf2023, </a></span>
-                            <span><a href="https://blog.riskreduction.net/tag/proc_self_mem.html">#proc_self_mem, </a></span>
-                            <span><a href="https://blog.riskreduction.net/tag/arbitrary_file_read_write.html">#arbitrary_file_read_write, </a></span>
-                            <span><a href="https://blog.riskreduction.net/tag/rust.html">#rust, </a></span>
+                            <span><a href="https://blog.riskreduction.net/tag/windows.html">#windows, </a></span>
+                            <span><a href="https://blog.riskreduction.net/tag/fuzzing.html">#fuzzing, </a></span>
                 </div>
 
             </div>

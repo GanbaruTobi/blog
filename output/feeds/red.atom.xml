@@ -19,70 +19,16 @@ It is &lt;a href="https://github.com/Cybereason/siofra"&gt;siofra&lt;/a&gt;.&lt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
-Generally the output can be considered in two parts, the binary analysis shows which dlls might be attackable with an exlamation mark:
-=======
-Generally the output can be considered in two parts, the binary analysis shows which DLLs might be attackable with an exlamation mark:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;Generally the output can be considered in two parts, the binary analysis shows which dlls might be attackable with an exlamation mark:&lt;/p&gt;
 &lt;p&gt;&lt;img alt="picture 1" src="../images/49369742dbe0ea41b57696a371613a5574117beee51a7cf96318b04763785fb5.png"&gt;  &lt;/p&gt;
 &lt;p&gt;In the next section it will analyse the probable attackable libraries and gives an exploitabilty suggestion:
 &lt;img alt="picture 2" src="../images/38019f07c834ac302e5f4c84eba042d7d9a2836f8f507832967946b3a8177bda.png"&gt;  &lt;/p&gt;
-&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
-Here you can see, which dll's one would have to place and where.
-=======
-Here you can see, which DLL's one would have to place and where.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc
+&lt;p&gt;Here you can see, which dll's one would have to place and where.
 A nice next step would be to get which of the vulnerable marked locations are writeable to us.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
 &lt;h3&gt;Koppeling&lt;/h3&gt;
 &lt;p&gt;When placing a DLL with our attack code, we quickly realize the need to provide all the functions that the main binary wants to import from the library. This challenge is addressed by using &lt;a href="https://github.com/monoxgas/Koppeling"&gt;koppeling&lt;/a&gt;. &lt;/p&gt;
 &lt;p&gt;Koppeling is a tool that allows us to provide the original desired DLL and our attacker code separately. It facilitates the merging of these components, ensuring that all the required functions are available for the application.&lt;/p&gt;
-&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
-I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&lt;/a&gt;, which uses Koppeling inside, since I had problems with the original code. Then we just need some dll code like this:
-=======
-I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&lt;/a&gt;, which uses Koppeling inside, since I had problems with the original code. Then we just need some DLL code like this:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&lt;/a&gt;, which uses Koppeling inside, since I had problems with the original code. Then we just need some DLL code like this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;lt;windows.h&amp;gt;&lt;/span&gt;
 &lt;span class="cp"&gt;#include&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="cpf"&gt;&amp;quot;pch.h&amp;quot;&lt;/span&gt;
 
@@ -119,25 +65,7 @@ I use &lt;a href="https://github.com/jfmaes/Invoke-DLLClone"&gt;Invoke-DLLClone&
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Placing it in the same directory as 010 editor and running it will cause this:&lt;/p&gt;
-&lt;p&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; HEAD
-&lt;img alt="picture 3" src="../images/aed4d3a15b0f37c3c97b5f5b5ba5a23b950a4742a951ec51dae51ae7a9594800.png"&gt;&lt;br&gt;
-=======&lt;/p&gt;
 &lt;p&gt;&lt;img alt="picture 4" src="../images/751f81fedc6f887b1a11848c7b64673a878e2f0dcefdbbe7c000a117b6e71a12.png"&gt;  &lt;/p&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;ffb806d5d60bcee6825dda9c7472b68de6a260cc&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
-&lt;/blockquote&gt;
 &lt;h2&gt;Downgrading&lt;/h2&gt;
 &lt;p&gt;Most of the time, I consider myself to be in a lower privileged position and contemplate injecting my code somewhere. However, there is another attack against DLL sideloading known as downgrading. This attack may be challenging or ineffective in low-privilege situations, but it becomes particularly interesting in higher privilege scenarios.&lt;/p&gt;
 &lt;p&gt;With downgrading, we can replace a DLL with a known vulnerable version. If the other imported functions remain intact, the loading process will succeed (although there may be cases where the output of the functions has changed, resulting in runtime issues, but this is not very common).&lt;/p&gt;
