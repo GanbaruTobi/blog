@@ -32,11 +32,11 @@
     <meta name="twitter:creator" content="">
     <meta name="twitter:url" content="https://blog.riskreduction.net/nyxing-thy-system.html">
     <meta name="twitter:title" content="gbaru's blog ~ Nyxing thy System">
-    <meta name="twitter:description" content="Since I am running my own arch OS, but still need capabilities for fuzzing with nyx, I see myself booting a Ubuntu System from an external drive. I wanted to fix this, so my friend manolis looked into getting the kernel to run on my Arch system. Ubuntu to Arch …">
+    <meta name="twitter:description" content="Since I am running my own Arch OS, but still need capabilities for fuzzing with nyx, I see myself booting an Ubuntu System from an external drive. I wanted to fix this, so my friend manolis looked into getting the kernel to run on my Arch system. Since we don&#39;t …">
 
     <!-- Facebook Meta Data -->
     <meta property="og:title" content="gbaru's blog ~ Nyxing thy System"/>
-    <meta property="og:description" content="Since I am running my own arch OS, but still need capabilities for fuzzing with nyx, I see myself booting a Ubuntu System from an external drive. I wanted to fix this, so my friend manolis looked into getting the kernel to run on my Arch system. Ubuntu to Arch …"/>
+    <meta property="og:description" content="Since I am running my own Arch OS, but still need capabilities for fuzzing with nyx, I see myself booting an Ubuntu System from an external drive. I wanted to fix this, so my friend manolis looked into getting the kernel to run on my Arch system. Since we don&#39;t …"/>
     <meta property="og:image" content=""/>
 </head>
 
@@ -83,7 +83,9 @@
                 <li><a
                         href="https://blog.riskreduction.net/category/red.html">Red</a></li>
                 <li><a
-                        href="https://blog.riskreduction.net/category/windows.html">windows</a></li>
+                        href="https://blog.riskreduction.net/category/windows.html">Windows</a></li>
+                <li><a
+                        href="https://blog.riskreduction.net/category/windows-fuzzing.html">windows, fuzzing</a></li>
         </ul>
 
 
@@ -96,14 +98,15 @@
             <h2 class="post_title post_detail"><a href="https://blog.riskreduction.net/nyxing-thy-system.html" rel="bookmark"
                                                   title="Permalink to Nyxing thy System">Nyxing thy System</a></h2>
             <div class="entry-content blog-post">
-                <p>Since I am running my own arch OS, but still need capabilities for fuzzing with nyx, I see myself booting a Ubuntu System from an external drive. I wanted to fix this, so my friend manolis looked into getting the kernel to run on my Arch system.</p>
+                <p>Since I am running my own Arch OS, but still need capabilities for fuzzing with nyx, I see myself booting an Ubuntu System from an external drive. I wanted to fix this, so my friend <a href="https://blog.manol.is/">manolis</a> looked into getting the kernel to run on my Arch system.</p>
+<p>Since we don't want to risk destroying my working kernel, this kernel will be installed as a second option.</p>
 <h2>Ubuntu to Arch Kernel</h2>
-<p>Our way is to download any prebuild nyx-kernel. For example from msFuzz <a href="https://github.com/IntelLabs/kafl.linux/releases/download/kvm-nyx-v6.0/linux-image-6.0.0-nyx+_6.0.0-nyx+-1_amd64.deb">nyx-6.0.0</a> or from nyx-fuzz <a href="https://github.com/nyx-fuzz/KVM-Nyx/releases/tag/v5.10.73-1.2">nyx-5.10.73</a>.</p>
-<p>I will go with the nyx-fuzz one for now. I download the kernel and make a new dir ubuntu_kernel.</p>
+<p>Our way is to download any prebuilt nyx-kernel. For example, from msFuzz <a href="https://github.com/IntelLabs/kafl.linux/releases/download/kvm-nyx-v6.0/linux-image-6.0.0-nyx+_6.0.0-nyx+-1_amd64.deb">nyx-6.0.0</a> or from nyx-fuzz <a href="https://github.com/nyx-fuzz/KVM-Nyx/releases/tag/v5.10.73-1.2">nyx-5.10.73</a>.</p>
+<p>We will go with the nyx-fuzz one for now. We downloaded the kernel and made a new dir ubuntu_kernel.</p>
 <p><img alt="picture 1" src="./images/5dde4bc256ce077a06bf5c773c35dbd4387ec22c21136dd51acf0a8443df6427.png">  </p>
-<p>Now we place the kernel and modules into our system. </p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>ubuntu_kernel
-cp<span class="w"> </span>ubuntu-kernel-5.10.75.zip<span class="w"> </span>ubuntu-kernel-5.10.75.zip
+<p>Now, we place the kernel and modules into our system. </p>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>ubuntu-kernel-5.10.75.zip<span class="w"> </span>ubuntu_kernel
+<span class="nb">cd</span><span class="w"> </span>ubuntu_kernel
 unzip<span class="w"> </span>ubuntu-kernel-5.10.75.zip
 
 mkdir<span class="w"> </span>kernel
@@ -119,7 +122,7 @@ ar<span class="w"> </span>x<span class="w"> </span>../linux-modules-5.10.75-0510
 sudo<span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>./lib/modules/5.10.75-051075-generic<span class="w"> </span>/usr/lib/modules/
 </code></pre></div>
 
-<p>After that we have the files in place but we have to create an initramfs. We can do so with mkinitfcpio, lets make a new preset for nyx.</p>
+<p>After that, we have the files in place, but we must create an initramfs. We can do so with mkinitfcpio. Let's make a new preset for nyx.</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>cp<span class="w"> </span>/etc/mkinitcpio.d/linux.preset<span class="w"> </span>/etc/mkinitcpio.d/nyx.preset
 </code></pre></div>
 
@@ -130,8 +133,8 @@ sudo<span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>
 sudo<span class="w"> </span>mkinitcpio<span class="w"> </span>-p<span class="w"> </span>nyx<span class="w"> </span>--kernel<span class="w"> </span><span class="m">5</span>.10.75-051075-generic
 </code></pre></div>
 
-<p>Now everything went without major errors for me.
-There might be some modules missing, but in general this works for me and makes it possible to run the nyx-fuzzers.</p>
+<p>Now everything went smoothly for me. 
+Some modules might be missing, but in general this works for me and makes it possible to run the nyx-fuzzers.</p>
             </div>
             <div class="post_list">
                 <span>By </span>
